@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindBridge — Student Focus & Reflection</title>
+<meta name="description" content="A student portfolio project for focused study sessions, reflection and optional AI chat.">
+<!--BUILD:HEAD-END-->
+<link rel="stylesheet" href="/assets/base.css?v=a3e8b77a4ef8">
+<link rel="stylesheet" href="/assets/polish.css?v=9b0eac2eb1f9">
+<link rel="stylesheet" href="/assets/dark-room.css?v=426a31c334d2">
+<link rel="stylesheet" href="/assets/help-dialog.css?v=b7e576f35911">
+<link rel="stylesheet" href="/assets/records.css?v=7fd3056d5093">
+<link rel="stylesheet" href="/assets/tools.css?v=9a432609b7e4">
+<link rel="stylesheet" href="/assets/chat.css?v=20d4172b823c">
+<link rel="stylesheet" href="/assets/accounts.css?v=3e09fa2a031d">
+<link rel="stylesheet" href="/assets/focus.css?v=49f1d73d538e">
+<link rel="stylesheet" href="/assets/accessibility.css?v=983d665dc920">
+<link rel="stylesheet" href="/assets/planner.css?v=1b4dad6c4dd7">
+<link rel="stylesheet" href="/assets/studio.css?v=c4dc9d07b074">
+<link rel="stylesheet" href="/assets/balance.css?v=76ed8b210497">
+<link rel="stylesheet" href="/assets/campus.css?v=45faa2ec4191">
+<link rel="stylesheet" href="/assets/campus-desk.css?v=808faa834040">
+<link rel="stylesheet" href="/assets/edition.css?v=69529bfaf48a">
+<link rel="stylesheet" href="/assets/start.css?v=55998c518926">
+<link rel="stylesheet" href="/assets/cinematic.css?v=c326597fc363">
+<link rel="stylesheet" href="/assets/living-details.css?v=95047094cca8">
+<link rel="stylesheet" href="/assets/garden-world.css?v=5283c2c5eaf3">
+<link rel="stylesheet" href="/assets/workspace.css?v=7de1336d88f2">
+<link rel="stylesheet" href="/assets/minimal-ui.css?v=094cf588959b">
+<link rel="stylesheet" href="/assets/product-ui.css?v=2880e3023201">
+<link rel="stylesheet" href="/assets/refined-ui.css?v=c0c519e73294">
+<link rel="stylesheet" href="/assets/next-step.css?v=99425bb83f85">
+<link rel="stylesheet" href="/assets/breath.css?v=52cef3507adc">
+<link rel="stylesheet" href="/assets/paper.css?v=93eb20bde445">
+</head>
+<body>
+<a class="mb-skip" href="#main-content">Skip to content</a>
+<div id="particles-container"></div>
+<div id="orbit-bg">
+  <div class="orbit-ring"></div><div class="orbit-ring"></div><div class="orbit-ring"></div><div class="orbit-ring"></div>
+  <div class="aurora-blob aurora-1"></div><div class="aurora-blob aurora-2"></div><div class="aurora-blob aurora-3"></div>
+</div>
+<div id="page-transition"></div>
+<div id="dark-room-overlay" style="position:fixed;inset:0;background:#0f1413;z-index:10000000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s ease">
+  <div class="dark-room-text" data-i18n="darkroom.text" style="color:#9aa39a;font-size:clamp(28px,5vw,44px);font-weight:600;font-family:var(--serif);margin-bottom:40px;text-align:center;max-width:600px;line-height:1.35"></div>
+  <button class="dark-room-btn" data-i18n="darkroom.exit" data-mb-click="toggleDarkRoom(false)" style="background:transparent;border:1px solid #6b756c;color:#c0c8be;min-height:44px;padding:10px 30px;border-radius:30px;cursor:pointer;font-family:var(--sans);transition:all .3s"></button>
+</div>
+
+<div id="preloader">
+  <div class="pl-word" id="pl-word"></div>
+  <div class="pl-tag" id="pl-tag" data-i18n="preloader.tag"></div>
+  <div class="pl-bar-bg"><div class="pl-bar" id="pl-bar"></div></div>
+</div>
+<div id="scroll-progress"></div>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<div id="sos-modal" role="dialog" aria-modal="true" aria-labelledby="sos-modal-title" style="position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(15px);z-index:999999;display:flex;align-items:center;justify-content:center;transition:opacity .4s">
+  <div class="sos-content" style="background:var(--bg3);padding:50px;border-radius:var(--r);max-width:480px;width:90%;text-align:center;transform:translateY(30px);transition:all .4s;border:1px solid var(--border)">
+    <h2 id="sos-modal-title" data-i18n="sos.title" style="font-family:var(--serif);font-size:30px;color:var(--red);margin-bottom:12px"></h2>
+    <p data-i18n="sos.desc" style="color:var(--ink2);margin-bottom:28px;font-size:15px;line-height:1.6"></p>
+    <a href="tel:116123" class="sos-number" data-i18n="sos.samaritans" style="display:block;background:var(--red);color:#fff;padding:18px;border-radius:var(--r2);font-size:22px;font-weight:700;text-decoration:none;margin-bottom:12px;transition:all .3s"></a>
+    <a href="tel:112" class="sos-number" data-i18n="sos.campus" style="display:block;background:var(--fixed-dark);color:#fff;padding:18px;border-radius:var(--r2);font-size:22px;font-weight:700;text-decoration:none;margin-bottom:24px;transition:all .3s"></a>
+    <p data-i18n="sos.emergency" style="font-size:13.5px;margin-bottom:0;color:var(--ink2)"></p>
+    <button class="sos-close" data-i18n="sos.close" data-mb-click="toggleSOS()" style="margin-top:20px;padding:10px 24px;background:transparent;border:1px solid var(--border);color:var(--ink);border-radius:30px;cursor:pointer;font-weight:600;transition:all .3s"></button>
+  </div>
+</div>
+
+<div class="controls-wrap">
+  <button class="btn-float btn-sos" data-mb-click="toggleSOS()" title="Crisis help">!</button>
+  <button class="btn-float btn-theme" id="theme-toggle" title="Toggle theme"><svg class="mb-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.2 8.2 0 1 0 20 14.2z"/></svg></button>
+</div>
+<button id="back-to-top" data-mb-click="scrollToTop()" title="Back to top" aria-label="Back to top">↑</button>
+
+<nav id="navbar" aria-label="Main navigation">
+  <a href="#" class="nav-logo" aria-label="MindBridge" data-mb-click="handleNavClick('home');return false">
+    <svg class="mb-brand-mark" viewBox="0 0 500 500" aria-hidden="true" focusable="false"><defs><linearGradient id="brand-orbit"><stop stop-color="#ef967b"/><stop offset="1" stop-color="#8064bb"/></linearGradient></defs><ellipse cx="250" cy="250" rx="154" ry="98" transform="rotate(-38 250 250)" fill="none" stroke="url(#brand-orbit)" stroke-width="62"/><ellipse cx="250" cy="250" rx="154" ry="98" transform="rotate(38 250 250)" fill="none" stroke="#76bdaa" stroke-width="38"/><path d="M130 334 C60 232 185 102 320 162" fill="none" stroke="url(#brand-orbit)" stroke-width="62" stroke-linecap="round"/></svg><span class="mb-wordmark">mind<span>bridge</span><small>CAMPUS / EVERYDAY</small></span>
+  </a>
+  <div class="nav-links">
+    <div class="magnetic"><button class="nav-link active" data-page="home" data-i18n="nav.home" data-mb-click="handleNavClick('home')"></button></div>
+    <div class="magnetic"><button class="nav-link" data-page="stories" data-i18n="nav.stories" data-mb-click="handleNavClick('stories')"></button></div>
+    <div class="magnetic"><button class="nav-link" data-page="tools" data-i18n="nav.tools" data-mb-click="handleNavClick('tools')"></button></div>
+    <div class="magnetic"><button class="nav-link" data-page="library" data-i18n="nav.library" data-mb-click="handleNavClick('library')"></button></div>
+    <div class="magnetic"><button class="nav-link" data-page="chat" data-i18n="nav.chat" data-mb-click="handleNavClick('chat')"></button></div>
+    <a class="nav-link mb-instagram-nav" href="https://www.instagram.com/mindbridge.eu/" target="_blank" rel="noopener noreferrer" aria-label="Instagram @mindbridge.eu">Instagram ↗</a>
+    <div class="magnetic"><button class="nav-link" data-page="contact" data-i18n="nav.contact" data-mb-click="handleNavClick('contact')"></button></div>
+    <div class="magnetic"><button class="nav-link quiz-link" data-page="quiz" data-i18n="nav.quiz" data-mb-click="handleNavClick('quiz')"></button></div>
+  </div>
+  <div class="nav-right">
+    <div class="magnetic lang-switch" id="lang-switch">
+      <button class="lang-btn" id="lang-btn" data-mb-click="toggleLangMenu()"><span id="lang-btn-label">EN</span><span class="lang-caret">▾</span></button>
+      <div class="lang-menu" id="lang-menu">
+        <button class="lang-opt" data-lang="en" data-mb-click="setLang('en')">English <small>EN</small></button>
+        <button class="lang-opt" data-lang="tr" data-mb-click="setLang('tr')">Türkçe <small>TR</small></button>
+        <button class="lang-opt" data-lang="de" data-mb-click="setLang('de')">Deutsch <small>DE</small></button>
+        <button class="lang-opt" data-lang="es" data-mb-click="setLang('es')">Español <small>ES</small></button>
+      </div>
+    </div>
+    <button class="hamburger" id="hamburger-btn" data-mb-click="toggleMobileNav()" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<main id="main-content" tabindex="-1">
+<!--BUILD:BODY-START-->
+<div id="page-home" class="page active">
+  <section class="hero">
+    <div class="hero-canvas">
+      <div class="hero-blob blob-1"></div>
+      <div class="hero-blob blob-2"></div>
+      <div class="hero-blob blob-3"></div>
+    </div>
+    <div class="hero-inner">
+      <div class="hero-badge"><span class="pulse-dot"></span><span data-i18n="hero.badge"></span></div>
+      <h1><span data-i18n="hero.h1a" class="split-lines"></span><br><span class="typewriter-text" id="typewriter"></span></h1>
+      <p class="hero-sub" data-i18n="hero.sub"></p>
+      <div class="hero-stat-pill"><span data-i18n-html="hero.statPill"></span></div>
+      <div class="hero-btns">
+        <div class="magnetic"><button class="btn-solid" data-i18n="hero.btnQuiz" data-mb-click="handleNavClick('quiz')"></button></div>
+        <div class="magnetic"><button class="btn-outline" data-i18n="hero.btnTools" data-mb-click="handleNavClick('tools')"></button></div>
+        <div class="magnetic"><button class="btn-outline" data-i18n="hero.btnSupport" data-mb-click="handleNavClick('contact')" style="background:rgba(192,57,43,.07);border-color:rgba(192,57,43,.3);color:var(--red)"></button></div>
+      </div>
+    </div>
+    <div class="scroll-cue"><span data-i18n="hero.scroll"></span><div class="scroll-cue-line"></div></div>
+  </section>
+
+  <div class="marquee-wrap" aria-hidden="true">
+    <div class="marquee-inner" id="marquee-inner"></div>
+  </div>
+
+
+  <section class="mb-instagram" aria-labelledby="mb-instagram-title">
+    <div class="mb-instagram-emblem" aria-hidden="true">m<span>↗</span></div>
+    <div><span class="mb-editorial-label">MINDBRIDGE / INSTAGRAM</span>
+      <h2 id="mb-instagram-title" data-i18n="social.title"></h2>
+      <p data-i18n="contact.igD"></p>
+      <a class="btn-solid" href="https://www.instagram.com/mindbridge.eu/" target="_blank" rel="noopener noreferrer" data-i18n="social.cta"></a>
+      <small data-i18n="social.external"></small>
+    </div>
+  </section>
+</div>
+<!--BUILD:HOME-->
+<div id="page-stories" class="page">
+  <div class="stories-header">
+    <div class="sec-eyebrow" data-i18n="stories.eyebrow"></div>
+    <h1 data-i18n-html="stories.title"></h1>
+    <p data-i18n="stories.sub"></p>
+  </div>
+  <div class="filter-row" id="stories-filter-row">
+    <button class="filt active" data-filter="all" data-i18n="stories.filterAll" data-mb-click="filterS('all',this)"></button>
+    <button class="filt" data-filter="stress" data-i18n="stories.filterStress" data-mb-click="filterS('stress',this)"></button>
+    <button class="filt" data-filter="social" data-i18n="stories.filterSocial" data-mb-click="filterS('social',this)"></button>
+    <button class="filt" data-filter="transition" data-i18n="stories.filterTransition" data-mb-click="filterS('transition',this)"></button>
+    <button class="filt" data-filter="identity" data-i18n="stories.filterIdentity" data-mb-click="filterS('identity',this)"></button>
+    <button class="filt" data-filter="burnout" data-i18n="stories.filterBurnout" data-mb-click="filterS('burnout',this)"></button>
+  </div>
+  <div class="stories-list" id="stories-list"></div>
+</div>
+<!--BUILD:STORIES-->
+<div id="page-tools" class="page">
+  <section class="section" style="padding-bottom:36px;text-align:center">
+    <div class="hero-badge" data-i18n="tools.badge"></div>
+    <h1 class="sec-title" data-i18n-html="tools.title" style="margin-bottom:16px"></h1>
+    <p style="color:var(--ink2);max-width:500px;margin:0 auto;line-height:1.7" data-i18n="tools.sub"></p>
+  </section>
+  <div class="tools-grid">
+    <div class="tool-card reveal">
+      <h3 data-i18n="tools.timer.h"></h3><p class="sub" data-i18n="tools.timer.d"></p>
+      <div class="timer-set" id="timer-set">
+        <button class="timer-step" data-mb-click="adjustTimer(-5)" aria-label="-5">−</button>
+        <input type="number" id="timer-minutes" class="timer-min-input" value="5" min="1" max="180">
+        <span class="timer-min-label" data-i18n="tools.timer.min"></span>
+        <button class="timer-step" data-mb-click="adjustTimer(5)" aria-label="+5">+</button>
+      </div>
+      <div class="timer-container"><div class="timer-circle" id="timer-circle"></div><div class="timer-inner"><div class="time-display" id="time-display">05:00</div></div></div>
+      <button class="btn-solid" id="timer-btn" data-i18n="tools.timer.btn" data-mb-click="toggleTimer()" style="padding:12px 28px;margin:0 auto;display:block"></button>
+    </div>
+    <div class="tool-card reveal" style="transition-delay:.06s">
+      <h3 data-i18n="tools.breath.h"></h3><p class="sub" data-i18n="tools.breath.d"></p>
+      <div class="breath-container"><div class="breath-circle" id="breath-circle" aria-hidden="true"></div><span class="breath-text" id="breath-text" data-i18n="tools.breath.ready"></span></div>
+      <button class="btn-outline" id="breath-btn" data-i18n="tools.breath.btn" data-mb-click="toggleBreathing()" style="padding:12px 28px;margin:0 auto;display:block"></button>
+    </div>
+    
+    <div class="tool-card reveal" style="transition-delay:.06s">
+      <h3 data-i18n="tools.journal.h"></h3><p class="sub" data-i18n="tools.journal.d"></p>
+      <textarea id="journal-input" class="tool-input" data-i18n-placeholder="tools.journal.ph" style="flex-grow:1;min-height:90px"></textarea>
+      <button class="btn-outline" data-i18n="tools.journal.btn" data-mb-click="saveJournal()" style="padding:12px 28px;width:100%"></button>
+      <p id="journal-status" data-i18n="tools.journal.saved" style="font-size:13.5px;color:var(--g);font-weight:600;margin-top:8px;opacity:0;transition:opacity .3s;text-align:center"></p>
+    </div>
+    <div class="tool-card reveal">
+      <h3 data-i18n="tools.dark.h"></h3><p class="sub" data-i18n="tools.dark.d"></p>
+      <div style="flex-grow:1;display:flex;align-items:center;justify-content:center;min-height:100px">
+        <button class="btn-solid" data-i18n="tools.dark.btn" data-mb-click="toggleDarkRoom(true)" style="padding:14px 28px;background:var(--fixed-dark);animation:none;border:1px solid var(--border);width:100%"></button>
+      </div>
+    </div>
+    
+    
+    
+    <div class="tool-card reveal" style="transition-delay:.06s">
+      <h3 data-i18n="tools.antitodo.h"></h3><p class="sub" data-i18n="tools.antitodo.d"></p>
+      <input type="text" id="anti-todo-input" class="tool-input" data-i18n-placeholder="tools.antitodo.ph">
+      <button class="btn-solid" data-i18n="tools.antitodo.btn" data-mb-click="addAntiTodo()" style="padding:12px 28px;width:100%;margin-bottom:18px"></button>
+      <div id="anti-todo-list" style="flex-grow:1;overflow-y:auto;max-height:160px"></div>
+    </div>
+    
+    <div class="tool-card reveal" style="transition-delay:.06s">
+      <h3 data-i18n="tools.control.h"></h3><p class="sub" data-i18n="tools.control.d"></p>
+      <input type="text" id="control-input" class="tool-input" data-i18n-placeholder="tools.control.ph">
+      <div style="display:flex;gap:9px;margin-bottom:18px">
+        <button class="btn-solid" data-i18n="tools.control.in" data-mb-click="addControlItem('in')" style="flex:1;padding:10px;font-size:13px"></button>
+        <button class="btn-outline" data-i18n="tools.control.out" data-mb-click="addControlItem('out')" style="flex:1;padding:10px;font-size:13px"></button>
+      </div>
+      <div style="display:flex;gap:16px;text-align:left">
+        <div style="flex:1;border-right:1px solid var(--border);padding-right:10px"><h4 data-i18n="tools.control.inLabel" style="font-size:13px;color:var(--g);margin-bottom:8px"></h4><div id="control-in-list"></div></div>
+        <div style="flex:1;opacity:.4"><h4 data-i18n="tools.control.outLabel" style="font-size:13px;color:var(--ink2);margin-bottom:8px"></h4><div id="control-out-list"></div></div>
+      </div>
+    </div>
+    
+    <div class="tool-card reveal" style="transition-delay:.06s">
+      <h3 data-i18n="tools.ground.h"></h3><p class="sub" data-i18n="tools.ground.d"></p>
+      <div id="grounding-content" style="flex-grow:1;background:var(--bg);border:1px solid var(--border);padding:28px 18px;border-radius:var(--r2);margin-bottom:14px;font-weight:500;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .3s;text-align:center;min-height:130px"></div>
+      <button class="btn-solid" id="grounding-btn" data-mb-click="nextGroundingStep()" style="padding:12px 28px;width:100%"></button>
+    </div>
+    <div class="tool-card reveal">
+      <h3 data-i18n="tools.sound.h"></h3><p class="sub" data-i18n="tools.sound.d"></p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-bottom:14px;flex-grow:1;align-items:center">
+        <button class="sound-btn" data-i18n="tools.sound.rain" data-mb-click="toggleSound(this,0)"></button>
+        <button class="sound-btn" data-i18n="tools.sound.cafe" data-mb-click="toggleSound(this,1)"></button>
+        <button class="sound-btn" data-i18n="tools.sound.lofi" data-mb-click="toggleSound(this,2)"></button>
+      </div>
+      <p id="sound-status" style="font-size:13.5px;color:var(--g);font-weight:600;opacity:0;transition:opacity .3s;text-align:center"></p>
+    </div>
+    <div class="tool-card reveal" style="transition-delay:.06s">
+      <h3 data-i18n="tools.gratitude.h"></h3><p class="sub" data-i18n="tools.gratitude.d"></p>
+      <div style="flex-grow:1;display:flex;flex-direction:column;justify-content:center;min-height:80px">
+        <input type="text" id="gratitude-input" class="tool-input" data-i18n-placeholder="tools.gratitude.ph">
+      </div>
+      <button class="btn-outline" data-i18n="tools.gratitude.btn" data-mb-click="saveGratitude()" style="padding:12px 28px;width:100%"></button>
+      <p id="gratitude-status" data-i18n="tools.gratitude.saved" style="font-size:13.5px;color:var(--g);font-weight:600;margin-top:10px;opacity:0;transition:opacity .3s;text-align:center"></p>
+    </div>
+    
+    <div class="tool-card reveal" style="transition-delay:.06s">
+      <h3 data-i18n="tools.break.h"></h3><p class="sub" data-i18n="tools.break.d"></p>
+      <div id="break-idea" data-i18n="tools.break.cta" style="flex-grow:1;display:flex;align-items:center;justify-content:center;background:var(--bg);border:1px dashed var(--border);border-radius:var(--r2);padding:20px;font-weight:500;font-size:15px;color:var(--ink);text-align:center;min-height:100px;transition:all .4s"></div>
+      <button class="btn-outline" data-i18n="tools.break.btn" data-mb-click="generateBreak()" style="margin-top:14px;width:100%"></button>
+    </div>
+    <div class="tool-card reveal" style="grid-column:1/-1;text-align:center">
+      <h3 data-i18n="tools.mood.h"></h3><p class="sub" data-i18n="tools.mood.d" style="text-align:center"></p>
+      <div style="display:flex;justify-content:center;gap:16px;margin:20px 0">
+        <button class="mood-btn" data-mb-click="selectMood(this)">😫</button>
+        <button class="mood-btn" data-mb-click="selectMood(this)">😞</button>
+        <button class="mood-btn" data-mb-click="selectMood(this)">😐</button>
+        <button class="mood-btn" data-mb-click="selectMood(this)">🙂</button>
+        <button class="mood-btn" data-mb-click="selectMood(this)">🤩</button>
+      </div>
+      <p id="mood-feedback" data-i18n="tools.mood.saved" style="font-weight:600;color:var(--g);opacity:0;transition:opacity .3s"></p>
+    </div>
+    <div class="tool-card reveal" style="grid-column:1/-1;text-align:center">
+      <h3 data-i18n="tools.canvas.h"></h3><p class="sub" data-i18n="tools.canvas.d" style="text-align:center"></p>
+      <canvas id="zen-canvas" width="1200" height="200"></canvas>
+    </div>
+    
+  </div>
+</div>
+<!--BUILD:TOOLS-->
+<div id="page-library" class="page">
+  <section class="section" style="padding-bottom:36px;text-align:center">
+    <div class="hero-badge" data-i18n="library.badge"></div>
+    <h1 class="sec-title" data-i18n-html="library.title" style="margin-bottom:16px"></h1>
+  </section>
+  <div class="library-grid">
+    <div class="reveal">
+      <h3 data-i18n="library.faqHeading" style="font-size:26px;margin-bottom:26px;font-family:var(--serif)"></h3>
+      <div id="faq-list"></div>
+      <div class="lib-section">
+        <h3 data-i18n="library.resHeading" style="font-size:24px;margin-bottom:8px;font-family:var(--serif)"></h3>
+        <p data-i18n="library.resSub" style="color:var(--ink2);font-size:14px"></p>
+        <div class="lib-cards" id="lib-cards"></div>
+      </div>
+    </div>
+    <div class="reveal" style="transition-delay:.15s">
+      <div class="quiet-zones">
+        <h3 data-i18n="library.zonesHeading" style="font-size:22px;margin-bottom:22px;font-family:var(--serif)"></h3>
+        <p data-i18n="library.zonesSub" style="color:var(--ink2);margin-bottom:18px;font-size:13.5px"></p>
+        <div id="zones-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--BUILD:LIBRARY-->
+<!--BUILD:CHAT-->
+<div id="page-chat" class="page">
+  <section class="section" style="padding-bottom:20px;text-align:center">
+    <div class="hero-badge" data-i18n="chat.badge"></div>
+    <h1 class="sec-title" data-i18n-html="chat.title" style="margin-bottom:14px"></h1>
+    <p data-i18n="chat.sub" style="color:var(--ink2);margin-bottom:36px;max-width:560px;margin-left:auto;margin-right:auto;line-height:1.7"></p>
+  </section>
+  <div class="section" style="padding-top:0">
+    <div class="chat-container reveal">
+      <div class="chat-history" id="chat-history"></div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input-box" class="chat-input" data-i18n-placeholder="chat.ph">
+        <button class="btn-solid" data-i18n="chat.send" data-mb-click="sendChatMessage()" style="padding:13px 28px"></button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--BUILD:CHAT-->
+<!--BUILD:CONTACT-->
+<div id="page-contact" class="page">
+  <section class="section" style="padding-bottom:36px;text-align:center">
+    <div class="hero-badge" data-i18n="contact.badge"></div>
+    <h1 class="sec-title" data-i18n-html="contact.title" style="margin-bottom:14px"></h1>
+    <p data-i18n="contact.sub" style="color:var(--ink2);max-width:500px;margin:0 auto;line-height:1.7"></p>
+  </section>
+  <div class="contact-grid">
+    <div class="contact-card highlight reveal">
+      <div style="font-size:40px;margin-bottom:14px;color:var(--g)"><svg class="mb-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20s-7.5-4.6-7.5-10A4.4 4.4 0 0 1 12 7.1 4.4 4.4 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/></svg></div>
+      <h3 data-i18n="contact.proH"></h3>
+      <p data-i18n="contact.proD"></p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <a href="tel:116123" class="btn-solid" data-i18n="contact.callBtn" style="text-decoration:none"></a>
+        <a class="btn-outline" data-i18n="contact.bookBtn" href="https://www.telefonseelsorge.de/telefon/" target="_blank" rel="noopener noreferrer" style="text-decoration:none"></a>
+      </div>
+    </div>
+    
+    <div class="contact-card reveal" style="text-align:center">
+      <div style="font-size:40px;margin-bottom:14px;color:var(--g)"><svg class="mb-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><path d="M12 10.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"/></svg></div>
+      <h3 data-i18n="contact.igH"></h3>
+      <p data-i18n="contact.igD"></p>
+      <a href="https://www.instagram.com/mindbridge.eu/" target="_blank" rel="noopener noreferrer" class="btn-solid" style="text-decoration:none;display:inline-block;margin-top:8px">@mindbridge.eu →</a>
+    </div>
+  </div>
+</div>
+<!--BUILD:CONTACT-->
+<!--BUILD:QUIZ-->
+<div id="page-quiz" class="page">
+  <div class="quiz-wrap">
+    <div class="sec-eyebrow" data-i18n="quiz.eyebrow"></div>
+    <h1 data-i18n-html="quiz.title"></h1>
+    <p class="sub-q" data-i18n="quiz.sub"></p>
+    <div id="quiz-main">
+      <div class="quiz-dots" id="quiz-dots"></div>
+      <div class="q-counter" id="q-counter"></div>
+      <div class="quiz-track" id="quiz-track"></div>
+      <p class="q-text" id="q-text"></p>
+      <p class="q-hint" id="q-hint"></p>
+      <div class="opts" id="q-opts"></div>
+      <div class="quiz-nav-row">
+        <span style="font-size:13px;color:var(--ink3)" id="q-nav-label"></span>
+        <button class="btn-next" id="btn-next" data-i18n="quiz.next" data-mb-click="nextQ()"></button>
+      </div>
+    </div>
+    <div id="quiz-result" style="display:none"></div>
+  </div>
+</div>
+<!--BUILD:QUIZ-->
+<!--BUILD:CHAT-->
+<!--BUILD:TEAM-->
+<!--BUILD:CONTACT-->
+<!--BUILD:QUIZ-->
+</main>
+<footer>
+  <div class="foot-logo">MindBridge</div>
+  <p data-i18n="footer.tagline" style="color:rgba(245,243,255,.65);max-width:400px;margin:0 auto 6px;font-size:14px"></p>
+  <a href="https://www.instagram.com/mindbridge.eu/" target="_blank" rel="noopener noreferrer" class="social-link">
+    <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+    <span data-i18n="footer.follow"></span>
+  </a>
+  <div style="display:flex;gap:6px;justify-content:center;margin-top:28px;flex-wrap:wrap">
+    <button style="background:transparent;border:none;color:rgba(245,243,255,.6);font-family:var(--sans);font-size:13px;cursor:pointer;padding:6px 12px;transition:color .2s" data-i18n="nav.home" data-mb-click="handleNavClick('home')"></button>
+    <button style="background:transparent;border:none;color:rgba(245,243,255,.6);font-family:var(--sans);font-size:13px;cursor:pointer;padding:6px 12px;transition:color .2s" data-i18n="nav.stories" data-mb-click="handleNavClick('stories')"></button>
+    <button style="background:transparent;border:none;color:rgba(245,243,255,.6);font-family:var(--sans);font-size:13px;cursor:pointer;padding:6px 12px;transition:color .2s" data-i18n="nav.tools" data-mb-click="handleNavClick('tools')"></button>
+    <button style="background:transparent;border:none;color:rgba(245,243,255,.6);font-family:var(--sans);font-size:13px;cursor:pointer;padding:6px 12px;transition:color .2s" data-i18n="nav.library" data-mb-click="handleNavClick('library')"></button>
+    <button style="background:transparent;border:none;color:rgba(245,243,255,.6);font-family:var(--sans);font-size:13px;cursor:pointer;padding:6px 12px;transition:color .2s" data-i18n="nav.contact" data-mb-click="handleNavClick('contact')"></button>
+    <button style="background:transparent;border:none;color:rgba(245,243,255,.6);font-family:var(--sans);font-size:13px;cursor:pointer;padding:6px 12px;transition:color .2s" data-i18n="nav.quiz" data-mb-click="handleNavClick('quiz')"></button>
+  </div>
+  <p data-i18n="footer.credit" style="font-size:12px;color:rgba(245,243,255,.55);margin-top:28px"></p>
+</footer>
+<!--BUILD:FOOTER-->
+<script id="mindbridge-events" src="/assets/events.js?v=1d986d90332f" defer></script>
+<script id="mindbridge-icons" src="/assets/icons.js?v=19582ebf1c13" defer></script>
+<script id="mindbridge-translations" src="/assets/translations.js?v=7499698ca10e" defer></script>
+<script id="mindbridge-core" src="/assets/app.js?v=e9ab4da22807" defer></script>
+<!--BUILD:SCRIPT-->
+
+<script id="mindbridge-stage-two" src="/assets/records.js?v=9237ff03e197" defer></script>
+
+<script id="mindbridge-stage-three" src="/assets/tools.js?v=b5207a0453b4" defer></script>
+<script id="mindbridge-stage-four" src="/assets/chat.js?v=54777f36f8b2" defer></script>
+<script id="mindbridge-stage-five" src="/assets/accounts.js?v=b13c0475f18f" defer></script>
+<script id="mindbridge-recovery-ui" src="/assets/recovery-ui.js?v=193d73285bd4" defer></script>
+<script id="mindbridge-stage-six" src="/assets/focus.js?v=b71cc47fb6f1" defer></script>
+<script id="mindbridge-planner-core" src="/assets/planner-core.js?v=18ed0fbf39f9" defer></script>
+<script id="mindbridge-planner" src="/assets/planner.js?v=7316d4239375" defer></script>
+<script id="mindbridge-reminders-core" src="/assets/reminders-core.js?v=ed13b7841b9b" defer></script>
+<script id="mindbridge-reminders" src="/assets/reminders.js?v=ccbeab28d437" defer></script>
+<script id="mindbridge-accessibility" src="/assets/accessibility.js?v=adfeb130c31f" defer></script>
+<script id="mindbridge-modern-ui" src="/assets/modern-ui.js?v=015d1b699109" defer></script>
+<script id="mindbridge-studio" src="/assets/studio.js?v=4b1c94bbde1b" defer></script>
+<script id="mindbridge-calm-options-core" src="/assets/calm-options-core.js?v=77fa7dfe50fb" defer></script>
+<script id="mindbridge-calm-options" src="/assets/calm-options.js?v=3de80bdb1ac3" defer></script>
+<script id="mindbridge-checkin" src="/assets/checkin.js?v=d13e4cd7f569" defer></script>
+<script id="mindbridge-campus-motion" src="/assets/campus-motion.js?v=4d2c7d3eff1e" defer></script>
+<script id="mindbridge-campus" src="/assets/campus.js?v=fab984bf1df0" defer></script>
+<script id="mindbridge-campus-desk" src="/assets/campus-desk.js?v=6cc4058e87db" defer></script>
+<script id="mindbridge-falling-sand" src="/assets/falling-sand.js?v=2f9b67061ec1" defer></script>
+<script id="mindbridge-zen-studio" src="/assets/zen-studio.js?v=1af7c1fad3fa" defer></script>
+<script id="mindbridge-field-search-core" src="/assets/field-search-core.js?v=863ee1bd9d59" defer></script>
+<script id="mindbridge-field-library" src="/assets/field-library.js?v=2878db259090" defer></script>
+<script id="mindbridge-start-core" src="/assets/start-core.js?v=ba99d356ca93" defer></script>
+<script id="mindbridge-start-copy" src="/assets/start-copy.js?v=7d1233b1fdf9" defer></script>
+<script id="mindbridge-start" src="/assets/start.js?v=92dd016c1ed3" defer></script>
+<script id="mindbridge-cinematic-core" src="/assets/cinematic-core.js?v=b260ef0b5898" defer></script>
+<script id="mindbridge-cinematic-renderer" src="/assets/cinematic-renderer.js?v=df08e807f2ad" defer></script>
+<script id="mindbridge-cinematic" src="/assets/cinematic.js?v=0dcccf5c674d" defer></script>
+<script id="mindbridge-living-details" src="/assets/living-details.js?v=ace12b5b3d31" defer></script>
+<script id="mindbridge-garden-world" src="/assets/garden-world.js?v=b1582369f9d4" defer></script>
+<script id="mindbridge-workspace-core" src="/assets/workspace-core.js?v=68d9a1193e2f" defer></script>
+<script id="mindbridge-workspace" src="/assets/workspace.js?v=b3a7043aee4a" defer></script>
+<script id="mindbridge-minimal-ui" src="/assets/minimal-ui.js?v=6d55f582f6fd" defer></script>
+<script id="mindbridge-product-ui" src="/assets/product-ui.js?v=1075f8f7a62b" defer></script>
+<script id="mindbridge-deep-check" src="/assets/deep-check.js?v=8eb662203cab" defer></script>
+<script id="mindbridge-experience-expansion" src="/assets/experience-expansion.js?v=7c1be454825e" defer></script>
+<script id="mindbridge-experts" src="/assets/experts.js?v=2303d5def041" defer></script>
+<script id="mindbridge-next-step-core" src="/assets/next-step-core.js?v=b57d082455c0" defer></script>
+<script id="mindbridge-next-step" src="/assets/next-step.js?v=5d55fad0ca78" defer></script>
+<script id="mindbridge-save-state" src="/assets/save-state.js?v=1b164ba6701e" defer></script>
+<script id="mindbridge-simplify" src="/assets/simplify.js?v=c29a2b03f9a2" defer></script>
+<script id="mindbridge-ask-help" src="/assets/ask-help.js?v=1dac1b8922d5" defer></script>
+<script id="mindbridge-welcome" src="/assets/welcome.js?v=061a56ac2884" defer></script>
+<script id="mindbridge-journey-core" src="/assets/journey-core.js?v=c68997d111d0" defer></script>
+<script id="mindbridge-journey" src="/assets/journey.js?v=39035c104d85" defer></script>
+<script id="mindbridge-calm-room" src="/assets/calm-room.js?v=15a8911506b9" defer></script>
+</body>
+</html>

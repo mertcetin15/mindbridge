@@ -1,0 +1,21 @@
+{
+  "note": "Source order is defined in page.html",
+  "modules": [
+    "translations.js",
+    "app.js",
+    "records.js",
+    "tools.js",
+    "chat.js",
+    "accounts.js",
+    "focus.js",
+    "accessibility.js",
+    "planner-core.js",
+    "planner.js",
+    "modern-ui.js",
+    "studio.js",
+    "checkin.js",
+    "campus-motion.js",
+    "campus.js",
+    "campus-desk.js"
+  ]
+}

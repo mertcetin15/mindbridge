@@ -1,0 +1,14 @@
+/* Breathing tool: the label is always centred on the circle, whatever theme,
+   language or earlier stylesheet is in play. It does not depend on ancestor ids. */
+#page-tools #mb-breath-tool .breath-container,.breath-container{position:relative;display:grid;place-items:center;width:100%;min-height:320px;margin:0 auto 24px;isolation:isolate;overflow:visible}
+#page-tools #mb-breath-tool .breath-container .breath-circle,.breath-container .breath-circle{grid-area:1/1;width:132px;height:132px;flex:none;border-radius:50%;transform-origin:center;will-change:transform;
+ background:radial-gradient(circle at 32% 25%,#6b927d,#345c50 70%);
+ box-shadow:0 0 0 14px rgba(113,151,132,.07),0 14px 40px rgba(36,75,57,.16)}
+[data-theme=dark] #page-tools #mb-breath-tool .breath-container .breath-circle,[data-theme=dark] .breath-container .breath-circle{background:radial-gradient(circle at 32% 25%,#577968,#2f5148 72%)}
+#page-tools #mb-breath-tool .breath-container .breath-text,.breath-container .breath-text{grid-area:1/1;position:static;inset:auto;display:block;box-sizing:border-box;
+ width:112px;max-width:112px;margin:0;padding:0;text-align:center;
+ font:600 17px/1.25 var(--sans,system-ui,sans-serif);letter-spacing:0;color:#fff;
+ text-shadow:0 1px 4px rgba(24,53,42,.45);text-wrap:balance;overflow-wrap:break-word;hyphens:auto;
+ pointer-events:none;z-index:1;transition:opacity .35s ease}
+@media(max-width:480px){#page-tools #mb-breath-tool .breath-container,.breath-container{min-height:290px}#page-tools #mb-breath-tool .breath-container .breath-circle,.breath-container .breath-circle{width:116px;height:116px}#page-tools #mb-breath-tool .breath-container .breath-text,.breath-container .breath-text{width:100px;max-width:100px;font-size:16px}}
+@media(prefers-reduced-motion:reduce){.breath-container .breath-circle{will-change:auto}.breath-container .breath-text{transition:none}}

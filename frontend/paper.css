@@ -1,0 +1,311 @@
+/* Paper layer: shared interaction tokens, brand text selection, one focus ring, static paper grain.
+   Loaded last on purpose. Earlier sheets each defined their own focus ring (3px/4px, 2px/4px,
+   2px/3px); the focus rule below is the single source of truth and is marked !important only
+   because it is an accessibility invariant that page-specific rules must not weaken. */
+/* Unified palette. polish/campus/edition/minimal-ui each declared their own :root colours and
+   minimal-ui (a green scheme) silently won. These are the editorial paper + cobalt values from
+   edition.css, re-asserted last. Clay and Forest are category accents for borders and rules only:
+   they do not reach 4.5:1 as small text on paper. */
+:root,:is(#page-tools,#page-library,.mb-workspace){
+ --sans:'Trebuchet MS','Segoe UI',Arial,sans-serif;--serif:'Iowan Old Style','Palatino Linotype','Book Antiqua',Georgia,serif;
+ --g:#304b98;--g2:#4562ad;--g3:#dbe3f5;--g4:#eef1f8;--on-g:#fff;
+ --bg:#f6f3e9;--bg2:#eae7dc;--bg3:#fffdf7;
+ --ink:#252c2b;--ink2:#505850;--ink3:#5e645d;
+ --border:#838a7c;--border2:#d3d6c9;
+ --clay:#ad684c;--forest:#60895e;
+ /* Meaning, not hue: action (--g), information (--info), success, caution, destructive (--danger). Each is >= 5:1 on paper, panel and wash. */
+ --info:var(--g);--success:#2f6b3a;--caution:#8a5300;--danger:#a12a2a;
+ --invalid-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a12a2a' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v6M12 16.5v.5'/%3E%3C/svg%3E");
+ --accent-grad:linear-gradient(var(--g),var(--g));
+ --r:5px;--r2:5px;
+}
+:root[data-theme=dark],[data-theme=dark] :is(#page-tools,#page-library,.mb-workspace){
+ --g:#aec1ff;--g2:#c1ceff;--g3:#354469;--g4:#252f43;--on-g:#172039;
+ --bg:#171d1c;--bg2:#252c28;--bg3:#202725;
+ --ink:#f1eee4;--ink2:#c0c8be;--ink3:#aeb7ac;
+ --border:#7c887c;--border2:#3d493e;
+ --success:#8fd19a;--caution:#f0c36a;--danger:#ff9b94;
+ --invalid-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff9b94' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v6M12 16.5v.5'/%3E%3C/svg%3E");
+}
+:root{
+ --focus-ring-width:2px;--focus-ring-offset:3px;
+ --select-bg:rgba(173,104,76,.24);--select-ink:inherit;
+ --grain-opacity:1;
+ --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .1 0 0 0 0 .1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+}
+[data-theme=dark]{
+ --select-bg:rgba(174,193,255,.30);
+ --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .95 0 0 0 0 .93 0 0 0 0 .89 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.028'/%3E%3C/svg%3E");
+}
+
+/* Tools, Library and workspace pages had their own "warm stone and brass" scheme, Inter type and
+   10-18px radii. They now share the editorial radius and serif headings; same selectors as
+   refined-ui.css so order, not specificity, decides. Avatars and circular controls are untouched. */
+:is(#page-tools,#page-library,.mb-workspace) :is(h1,h2,h3),#page-tools>.section h1,#page-library .mb-field-header h1{font-family:var(--serif)!important;font-weight:500}
+:is(#page-tools,#page-library,.mb-workspace) :is(.btn-sm,.btn-solid,.btn-outline,.mb-stage3-control,.mb-w-primary),
+#page-tools :is(.mb-planner,.mb-focus-plan) button,.mb-workspace button,
+:is(#page-tools,#page-library,.mb-workspace) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea),
+#page-tools :is(.mb-tool-tabs,.mb-tool-tab,.mb-tool-workarea,.mb-tools-archive),
+#page-tools :is(.mb-simple-hub,.mb-tool-directory)>.mb-task-link,
+#page-tools .mb-tools-archive :is(.mb-planner,.mb-focus-plan,.tool-card),
+#page-library :is(.mb-field-rail,.mb-field-card,.mb-field-sources),#page-library .mb-field-tabs button,
+.mb-workspace,#page-home .hero-btns :is(#mb-home-begin,.mb-workspace-home),
+.mb-deep-check,.mb-deep-check button,.mb-deep-map article,.mb-deep-advice,.mb-deep-support,
+.mb-original-stories details,.mb-expert-preview,.mb-experts>button,.mb-expert-filter select,.mb-demo-expert,
+.mb-primary-tool button:not(.mb-tool-tab){border-radius:var(--r)!important}
+
+/* One keyboard focus ring everywhere: 2px, 3px offset, brand colour. */
+html body :is(a,button,input,select,textarea,summary,[tabindex]):focus-visible,
+html body :focus-visible{
+ outline:var(--focus-ring-width) solid var(--g)!important;
+ outline-offset:var(--focus-ring-offset)!important;
+}
+html body :focus:not(:focus-visible){outline:none}
+
+/* Brand-consistent selection where text stays selectable. */
+::selection{background:var(--select-bg);color:var(--select-ink)}
+
+/* Selection blocking is opt-in and limited to controls and decoration.
+   Exempt (never listed here): Journal, chat messages, Library articles, form fields, error text,
+   code blocks and every copyable paragraph. */
+:is(button,summary,[role=button],[role=tab],.btn-solid,.btn-outline,.btn-sm,.btn-next,.nav-link,.nav-logo,
+ .sound-btn,.timer-step,.mb-swatch,.mb-stage3-control,.mb-motion-bar,.mb-campus-art,.mb-sculpture-mark,
+ .hero-badge,.pulse-dot,.non-selectable,canvas){
+ -webkit-user-select:none;user-select:none;
+}
+:is(input,textarea,[contenteditable=true],.selectable-content){-webkit-user-select:text;user-select:text}
+:is(img[alt=""],img[aria-hidden=true],svg[aria-hidden=true],.decorative-image,.mb-brand-mark){-webkit-user-drag:none;user-drag:none}
+
+/* Footer navigation hover/focus. Replaces inline onmouseover/onmouseout; !important only because the
+   buttons still carry an inline colour in markup. Keyboard focus now gets the same highlight. */
+footer button[data-mb-click]:is(:hover,:focus-visible){color:#fff!important}
+
+/* Printed dial: hairline track, 3px cobalt arc, twelve static ticks, no shadow, no neon, no colour change
+   at zero. Digits use tabular figures where the font offers them and a minimum width everywhere else. */
+.timer-circle{box-shadow:none;transition:none}
+.timer-inner{inset:3px;box-shadow:inset 0 0 0 1px var(--border2)}
+.timer-container::after{content:'';position:absolute;inset:11px;border-radius:50%;z-index:3;pointer-events:none;opacity:.55;
+ background:repeating-conic-gradient(from -.4deg,var(--ink3) 0 .8deg,transparent .8deg 30deg);
+ -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 7px));mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 7px))}
+.time-display{font-weight:500;letter-spacing:-1px;font-variant-numeric:lining-nums tabular-nums;font-feature-settings:'tnum' 1,'lnum' 1;min-width:5ch;text-align:center}
+/* Non-circular, low-motion presentation: narrow screens, reduced motion and Simplify. */
+@media (max-width:360px),(prefers-reduced-motion:reduce){
+ .timer-container{width:100%;max-width:320px;height:auto;display:block}
+ .timer-container::after{display:none}
+ .timer-circle{position:static;height:6px;border-radius:3px;margin:0 0 14px;background:linear-gradient(to right,var(--g) calc(var(--p,100)*1%),var(--bg2) 0)!important}
+ .timer-inner{position:static;background:none;display:block;text-align:center;box-shadow:none}
+}
+html[data-simplify=on] .timer-container{width:100%;max-width:320px;height:auto;display:block}
+html[data-simplify=on] .timer-container::after{display:none}
+html[data-simplify=on] .timer-circle{position:static;height:6px;border-radius:3px;margin:0 0 14px;background:linear-gradient(to right,var(--g) calc(var(--p,100)*1%),var(--bg2) 0)!important}
+html[data-simplify=on] .timer-inner{position:static;background:none;display:block;text-align:center;box-shadow:none}
+
+/* Narrow screens: the story hover highlight reached 48px beyond each side and forced a horizontal scrollbar. */
+@media(max-width:700px){.story-item::after{left:-12px;right:-12px}#page-stories{overflow-x:clip}}
+
+/* Editorial section labels, numbered in navigation order (01 and the Library carry their own). */
+:is(#page-stories>.stories-header,#page-tools>.section:first-child,#page-chat>.section:first-child,#page-contact>.section:first-child,#page-quiz>.quiz-wrap)::before{
+ display:block;margin:0 0 20px;font:11px/1.4 'Courier New',monospace;letter-spacing:2px;color:var(--ink2);text-transform:uppercase}
+#page-stories>.stories-header::before{content:'02 / Stories'}
+#page-tools>.section:first-child::before{content:'03 / Tools'}
+#page-chat>.section:first-child::before{content:'05 / Chat'}
+#page-contact>.section:first-child::before{content:'06 / Contact'}
+#page-quiz>.quiz-wrap::before{content:'07 / Self-check'}
+
+/* Step status control and weekly description in the planner. State is always written out with a symbol. */
+.mb-task-status{display:inline-block;margin:0}
+.mb-task-status select{min-height:44px;padding:8px 10px;font:13px/1.3 var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--border);border-radius:var(--r)}
+.mb-planner-week{margin:12px 0;padding:10px 14px;background:var(--bg2);border-left:3px solid var(--g);border-radius:var(--r)}
+.mb-planner-week>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:600}
+.mb-planner-week p{margin:6px 0;font-size:14px;line-height:1.6}
+
+/* One icon family: same grid, stroke and geometry everywhere; colour follows the text, so it follows the theme. */
+.mb-icon{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.125em;pointer-events:none}
+.btn-theme .mb-icon{width:22px;height:22px}
+
+/* Entry to the Dark Room, inside the Pause tool. */
+#page-tools .mb-calm-room{margin:20px 0 0;padding-top:16px;border-top:1px solid var(--border2)}
+#page-tools .mb-calm-room-hint{margin:8px 0 0;font-size:13px;line-height:1.6;color:var(--ink2);max-width:520px}
+
+/* Welcome and "right now" on the home page: calm, non-modal, never covers content. */
+.mb-welcome{max-width:1100px;margin:24px auto;padding:0 32px}
+.mb-welcome-tour,.mb-rightnow{padding:20px 24px;background:var(--bg3);border:1px solid var(--border);border-top:3px solid var(--g);border-radius:var(--r);text-align:left}
+.mb-rightnow{margin-top:14px;border-top-color:var(--forest)}
+.mb-welcome h2{font-family:var(--serif);font-weight:500;margin:6px 0 6px}
+.mb-welcome-intro{font-size:14px;line-height:1.7;color:var(--ink2);margin:0 0 14px}
+.mb-welcome-list{list-style:none;margin:0 0 14px;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.mb-welcome-pointer{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;min-height:72px;padding:12px 14px;text-align:left;font:14px/1.4 var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--border);border-radius:var(--r)}
+.mb-welcome-pointer span{font-size:12px;color:var(--ink2)}
+.mb-welcome-actions{display:flex;flex-wrap:wrap;gap:8px}
+.mb-welcome-button,.mb-welcome-chip{min-height:44px;padding:8px 14px;font:13px/1.3 var(--sans);color:var(--ink);background:transparent;border:1px solid var(--border);border-radius:var(--r)}
+.mb-welcome-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.mb-welcome-chip[aria-pressed=true]{border:2px solid var(--g);font-weight:700;background:var(--g4)}
+.mb-rightnow>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:600}
+.mb-rightnow-result{font-size:14px;line-height:1.7;margin:0 0 10px}
+.mb-welcome-status{min-height:0;font-size:13px;margin:8px 0 0}
+@media(max-width:800px){.mb-welcome-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.mb-welcome{padding:0 16px}.mb-welcome-tour,.mb-rightnow{padding:16px}.mb-welcome-list{grid-template-columns:1fr}}
+
+/* The empty-result card shares the card radius (it was the only square card). */
+.mb-field-empty{border-radius:var(--r)}
+
+/* Library search: why a guide is shown, and what to try when nothing is. */
+#page-library .mb-field-why{margin:6px 0 0;font:600 12px/1.5 var(--sans);color:var(--ink2);letter-spacing:.01em}
+#page-library .mb-field-hint{margin:0 0 14px;font-size:14px;line-height:1.7;color:var(--ink2)}
+
+/* Reminders panel: calm, left-aligned, no alarm colours. A ready reminder is marked by a symbol, text and border. */
+#page-tools .mb-reminders{max-width:936px;margin:0 auto 32px;padding:24px;background:var(--bg3);border:1px solid var(--border);border-top:3px solid var(--forest);border-radius:var(--r);text-align:left}
+#page-tools .mb-reminders h2{font-family:var(--serif);font-weight:500;margin:0 0 8px}
+#page-tools .mb-reminders-intro{font-size:14px;line-height:1.7;color:var(--ink2);margin:0 0 14px}
+#page-tools .mb-reminders-form{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin:0 0 12px}
+#page-tools .mb-reminders label{display:block;font-size:13px;font-weight:700}
+#page-tools .mb-reminders-form label>span{display:block;margin-bottom:6px}
+#page-tools .mb-reminders select,.mb-reminders input[type=datetime-local]{min-height:44px;min-width:200px;padding:9px 10px;font:15px/1.4 var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--border);border-radius:var(--r)}
+#page-tools .mb-reminders label.mb-reminders-notify{display:flex;align-items:center;gap:10px;min-height:44px;font-weight:500!important}
+#page-tools .mb-reminders-notify input{width:18px;height:18px;accent-color:var(--g)}
+#page-tools .mb-reminders-status{min-height:1.6em;font-size:13px;margin:0 0 10px}
+#page-tools .mb-reminder-ready-item{margin:0 0 12px;padding:14px 16px;background:var(--g4);border-left:4px double var(--g);border-radius:var(--r)}
+#page-tools .mb-reminder-ready-item::before{content:'◆ ';color:var(--g)}
+#page-tools .mb-reminder-ready-item p{margin:4px 0;font-size:14px}
+#page-tools .mb-reminders-list{list-style:none;margin:0 0 12px;padding:0}
+#page-tools .mb-reminders-list li{padding:10px 0;border-top:1px solid var(--border2);font-size:14px;line-height:1.6}
+#page-tools .mb-reminders-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+#page-tools .mb-reminders-actions button{min-height:44px;padding:8px 14px;font:13px/1.3 var(--sans);color:var(--ink);background:transparent;border:1px solid var(--border);border-radius:var(--r)}
+@media(max-width:600px){#page-tools .mb-reminders{margin:0 16px 28px;padding:18px}#page-tools .mb-reminders select,#page-tools .mb-reminders input[type=datetime-local]{min-width:0;width:100%}#page-tools .mb-reminders-form label{flex:1 1 100%}}
+
+/* Ask-for-support template card. Left-aligned, fields stacked, editable text area. */
+.mb-ask{max-width:760px;margin:0 auto 40px;padding:28px;background:var(--bg3);border:1px solid var(--border);border-top:3px solid var(--forest);border-radius:var(--r);text-align:left}
+.mb-ask h2{font-family:var(--serif);font-weight:500;margin:0 0 8px}
+.mb-ask-intro,.mb-ask-limits{font-size:14px;line-height:1.7;color:var(--ink2);margin:0 0 16px}
+.mb-ask label{display:block;margin:0 0 14px;font-size:13px;font-weight:700}
+.mb-ask label>span{display:block;margin-bottom:6px}
+.mb-ask select,.mb-ask textarea{width:100%;min-height:44px;padding:10px;font:16px/1.6 var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--border);border-radius:var(--r)}
+.mb-ask textarea{resize:vertical}
+.mb-ask-actions{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 10px}
+.mb-ask-status{min-height:1.6em;font-size:13px;color:var(--ink);margin:0 0 10px}
+@media(max-width:600px){.mb-ask{margin:0 16px 32px;padding:20px}}
+
+/* Simplify: decoration and motion only. Durations collapse instead of being removed so that
+   anything revealed by an animation still reaches its final visible state. */
+.mb-sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.mb-simplify{min-height:44px;padding:8px 14px;font:600 12px/1.3 var(--sans);color:var(--ink);background:transparent;border:1px solid var(--border);border-radius:var(--r)}
+.mb-simplify[aria-pressed=true]{border:2px solid var(--g);background:var(--g4);color:var(--g)}
+html[data-simplify=on] :is(#mb-cinema-canvas,.mb-cinema-fallback,.mb-campus-art,.mb-living-vine,[class*=sculpture],.mb-motion-bar,.hero-badge,.pulse-dot){display:none!important}
+html[data-simplify=on] *,html[data-simplify=on] *::before,html[data-simplify=on] *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+html[data-simplify=on] body::after{display:none}
+@media(max-width:600px){.mb-simplify{padding:8px 10px}}
+/* Very narrow phones: the text label is replaced by a 44px symbol so the menu button stays on screen.
+   The words remain in the DOM (font-size:0 keeps them for assistive technology). */
+@media(max-width:400px){
+ .mb-simplify{width:44px;min-width:44px;padding:0;font-size:0}
+ .mb-simplify::before{content:'◐';font-size:20px;line-height:1}
+ .mb-brand-mark{width:34px;height:34px}.mb-wordmark{font-size:16px}
+}
+
+/* Journal prompt style chips: small, equal weight, state shown by outline thickness and weight. */
+.mb-desk-tones{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.mb-desk-tone{min-height:44px;padding:8px 14px;font:500 13px/1.3 var(--sans);color:var(--ink);background:transparent;border:1px solid var(--border);border-radius:var(--r)}
+.mb-desk-tone[aria-pressed=true]{border:2px solid var(--g);font-weight:700;background:var(--g4)}
+
+/* Save state: symbol + words + border style differ per state, so colour is never the only signal. */
+.mb-save-state{margin:10px 0 0;padding:8px 12px;font-size:13px;line-height:1.6;color:var(--ink);background:var(--bg2);border-left:3px dotted var(--ink3);border-radius:var(--r)}
+.mb-save-state:empty{display:none}
+.mb-save-state[data-state=saving]{border-left-style:dashed}
+.mb-save-state[data-state=saved]{border-left:3px solid var(--success)}
+.mb-save-state[data-state=failed]{border-left:4px double var(--danger);font-weight:600}
+
+/* Static paper grain (~3%): one fixed tiling layer, no animation, inert to the pointer.
+   Form fields sit above it so typing surfaces stay clean. */
+body::after{
+ content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+ background-image:var(--grain);background-size:180px 180px;opacity:var(--grain-opacity);
+}
+:is(input,textarea,select){position:relative;z-index:2}
+@media (prefers-contrast:more),(forced-colors:active){body::after{display:none}}
+@media print{body::after{display:none}}
+
+/* ---- Interaction state vocabulary -------------------------------------------------------------
+   idle | hover | focus-visible (above) | pressed | pending | success | empty | error | disabled.
+   Every signal beyond colour is a shape: dashed outline (disabled), dotted + progress cursor (pending),
+   thick or double border plus an icon (error), an inset edge (pressed). Nothing changes size.
+   !important is used only for the signals that page-specific rules must not be able to weaken.
+   Several earlier sheets scope their rules under #page-tools and mark them !important, so the state selectors add two
+   :not(#mb-boost-a):not(#mb-boost-b). They match every element (no such ids exist) and each adds the weight of an id. */
+:root{--control-min:44px}
+
+/* pressed: an inset edge, no movement, no size change */
+html body :is(button,[role=button],.btn-solid,.btn-outline,.btn-sm,.btn-next,.mb-welcome-chip,.mb-desk-tone):active:not(:disabled):not([aria-disabled=true]){box-shadow:inset 0 2px 0 rgba(0,0,0,.16)}
+
+/* disabled: not opacity alone. A dashed outline, muted ink, no raised or filled look, and a not-allowed cursor.
+   Skipped inside a busy container, where controls are only waiting (see pending), so saves do not flash. */
+html body :is(button,[role=button],.btn-solid,.btn-outline,.btn-sm,.btn-next,input,select,textarea):is(:disabled,[aria-disabled=true]):not([aria-busy=true] *):not([aria-busy=true]):not(#mb-boost-a):not(#mb-boost-b){
+ border-style:dashed!important;border-color:var(--border)!important;color:var(--ink3)!important;box-shadow:none!important;background-image:none!important;cursor:not-allowed!important}
+html body :is(button,[role=button],.btn-solid,.btn-next):is(:disabled,[aria-disabled=true]):not([aria-busy=true] *):not([aria-busy=true]):not(#mb-boost-a):not(#mb-boost-b){background-color:var(--bg2)!important}
+
+/* pending: still the same control, with a progress cursor and a dotted edge; the words come from a live region */
+html body [aria-busy=true] :is(button,[role=button],input,select,textarea):is(:disabled,[aria-disabled=true]):not(#mb-boost-a):not(#mb-boost-b),
+html body :is(button,[role=button],input,select,textarea)[aria-busy=true]:not(#mb-boost-a):not(#mb-boost-b){cursor:progress!important;border-style:dotted!important;opacity:1!important}
+html body [aria-busy=true]{cursor:progress}
+
+/* error: thick border plus an icon, never colour alone; short numeric fields use a double border instead of an icon */
+html body :is(input,select,textarea)[aria-invalid=true]:not(#mb-boost-a):not(#mb-boost-b){border:2px solid var(--danger)!important;padding-right:40px;background-image:var(--invalid-icon)!important;background-repeat:no-repeat!important;background-position:right 10px center!important;background-size:18px!important}
+html body input[type=number][aria-invalid=true]:not(#mb-boost-a):not(#mb-boost-b){border:4px double var(--danger)!important;padding-right:revert;background-image:none!important}
+
+/* destructive intent: one colour that holds up in both themes (the old fixed red was 2.6:1 on the dark page) */
+html body .mb-danger:not(#mb-boost-a):not(#mb-boost-b),html body button[data-copy=remove]:not(#mb-boost-a):not(#mb-boost-b),html body .mb-delete:not(#mb-boost-a):not(#mb-boost-b){color:var(--danger)!important;border-color:var(--danger)!important}
+
+/* target size for the controls this file introduced */
+.mb-welcome-chip,.mb-desk-tone,.mb-simplify,.mb-reminders-actions button{min-height:var(--control-min)}
+/* One type for the chip family (welcome chip, prompt style, simplify). They differed: 13/400, 13/500, 12/600. */
+.mb-welcome-chip,.mb-desk-tone{font:500 13px/1.3 var(--sans)}
+@media(min-width:401px){.mb-simplify{font:500 13px/1.3 var(--sans)}}
+
+/* Self-check: options on a heavy day. All the same weight on purpose. */
+.mb-calm-options{margin:16px 0;padding:16px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg2)}
+.mb-calm-row{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.mb-calm-option{min-height:var(--control-min)}
+.mb-calm-status{min-height:1.4em;margin:0 0 8px;color:var(--ink)}
+.mb-calm-limits{font-size:13px;color:var(--ink2);margin:8px 0}
+
+.mb-task-passed{margin:6px 0 0;font-size:13px;color:var(--ink2)}
+
+/* Checkboxes: at least 24px, in a label that is a 44px target (the chat consent box measured 13px). */
+input[type=checkbox]{width:24px!important;height:24px!important;min-width:24px;min-height:24px;flex:none;accent-color:var(--g);margin:0}
+label:has(>input[type=checkbox]){display:flex;align-items:flex-start;gap:10px;min-height:var(--control-min)}
+
+/* The story hover wash reaches 48px outside the row; clip it at every width, not only under 700px (768px measured 18px of sideways scroll). */
+#page-stories{overflow-x:clip}
+
+/* Story index numerals are 34px text at .5 opacity: measured 2.08:1 (large text needs 3:1). */
+.story-num{opacity:.78}
+
+/* One corner radius for controls on every page. Tools and Library already used --r (5px); Chat, Contact and
+   Self-check buttons and fields were still 6px (found by the gallery and by measuring the real pages). */
+:is(#page-chat,#page-contact,#page-quiz) :is(.btn-sm,.btn-solid,.btn-outline,.btn-next,input:not([type=checkbox]):not([type=radio]),select,textarea){border-radius:var(--r)!important}
+
+/* Type scale. One set of sizes; the older sheets keep their own values where they set one. The :where() rules below
+   have zero specificity, so they only fill in headings and form fields that no other rule styles (the browser
+   defaults were 32px, 24px and 18.72px headings and an unstyled text field). */
+:root{--fs-xs:12px;--fs-sm:13px;--fs-md:15px;--fs-lg:18px;--fs-xl:24px;--fs-2xl:32px;--lh-tight:1.25;--lh-body:1.6}
+:where(h1){font-size:var(--fs-2xl);line-height:var(--lh-tight)}
+:where(h2){font-size:var(--fs-xl);line-height:var(--lh-tight)}
+:where(h3){font-size:var(--fs-lg);line-height:var(--lh-tight)}
+:where(h4){font-size:var(--fs-md);line-height:var(--lh-tight)}
+:where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=hidden]):not([type=file]),select,textarea){
+ box-sizing:border-box;min-height:var(--control-min);padding:9px 12px;font:var(--fs-sm)/1.4 var(--sans);color:var(--ink);background:var(--bg3);border:1px solid var(--border);border-radius:var(--r)}
+
+/* Library: related guides from the same editorial category */
+.mb-field-more{margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
+.mb-field-more-label{margin:0 0 8px;font-size:var(--fs-xs);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.mb-field-more button{display:block;margin:0 0 8px;min-height:var(--control-min)}
+
+/* Account recovery (no email) */
+.mb-recovery-code{display:block;margin:8px 0;padding:12px 14px;font:600 var(--fs-lg)/1.3 'Courier New',monospace;letter-spacing:.08em;word-break:break-all;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);user-select:all}
+.mb-recovery-shown{margin:12px 0}
+.mb-recover-form label,.mb-recovery-create label{display:block;margin:8px 0}
+
+/* Account recovery (no email) */
+.mb-recovery-code{display:block;margin:8px 0;padding:12px 14px;font:600 var(--fs-lg)/1.3 'Courier New',monospace;letter-spacing:.08em;word-break:break-all;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);user-select:all}
+.mb-recovery-shown{margin:12px 0}
+.mb-recover-form label,.mb-recovery-create label{display:block;margin:8px 0}
+

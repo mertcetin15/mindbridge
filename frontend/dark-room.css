@@ -1,0 +1,5 @@
+#dark-room-overlay{opacity:0;pointer-events:none}#dark-room-overlay.active{opacity:1;pointer-events:auto}
+/* Dark Room: warm near-black, never pure black; the way out is always easy to see. Hover raises contrast instead of lowering it. */
+.dark-room-btn:hover,.dark-room-btn:focus-visible{background:#1f2725;color:#fff;border-color:#9aa39a}
+/* No fade for people who ask for less motion. The inline transition needs !important to be overridden. */
+@media (prefers-reduced-motion:reduce){#dark-room-overlay,#dark-room-overlay *{transition:none!important}}

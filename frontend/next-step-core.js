@@ -1,0 +1,8 @@
+/* User-reported steps only. No inferred health profile or automatic diagnosis. */
+(()=>{'use strict';
+const statuses=['pending','tried','partly','notyet','irrelevant'],helps=['yes','unsure','no'];
+function clean(raw){if(!raw||raw.version!==1||!Array.isArray(raw.entries))throw Error('Invalid step history');const seen=new Set();return {version:1,entries:raw.entries.slice(0,30).filter(e=>e&&typeof e.id==='string'&&!seen.has(e.id)&&seen.add(e.id)&&typeof e.text==='string'&&e.text.trim()&&statuses.includes(e.status)&&Number.isFinite(e.created)).map(e=>({id:e.id.slice(0,100),text:e.text.trim().slice(0,300),topic:Number.isInteger(e.topic)&&e.topic>=0&&e.topic<=5?e.topic:5,when:['now','today','later'].includes(e.when)?e.when:'later',created:e.created,status:e.status,help:['tried','partly'].includes(e.status)&&helps.includes(e.help)?e.help:null,favorite:['tried','partly'].includes(e.status)&&e.help==='yes'&&e.favorite===true,before:[1,2,3].includes(e.before)?e.before:null,after:[1,2,3].includes(e.after)?e.after:null}))};}
+function create(text,topic,when,before,after){if(typeof text!=='string'||!text.trim()||text.trim().length>300)throw Error('Invalid step');return clean({version:1,entries:[{id:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2),text,topic,when,before,after,created:Date.now(),status:'pending'}]}).entries[0];}
+function report(entry,status,help){if(!statuses.includes(status))throw Error('Invalid feedback');return {...entry,status,help:['tried','partly'].includes(status)&&helps.includes(help)?help:null,favorite:['tried','partly'].includes(status)&&help==='yes'&&entry.favorite===true};}
+window.MBNextStepCore={clean,create,report};
+})();

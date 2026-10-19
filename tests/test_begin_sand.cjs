@@ -1,0 +1,13 @@
+'use strict';
+const assert=require('node:assert/strict'),Sand=require('../frontend/falling-sand.js'),Core=require('../frontend/start-core.js');
+let tests=0;function test(name,fn){fn();tests++;console.log('PASS '+name);}
+const sand=new Sand(60,40),count=()=>sand.cells.reduce((n,x)=>n+(x>0),0);
+test('grains move downward rather than painting at the pointer',()=>{sand.pour(.5,.1,1,2,5);const original=sand.snapshot();sand.step();assert(!sand.cells.slice(0,5*60).some(Boolean));assert.equal(count(),original.reduce((n,x)=>n+(x>0),0));});
+test('released grains settle on the floor and the simulation becomes idle',()=>{sand.settle();assert.equal(sand.active,false);assert(sand.cells.slice(-60).some(Boolean));});
+test('sustained pouring forms a supported pile without losing grains',()=>{let n=count();for(let i=0;i<80;i++){n+=sand.pour(.5,.05,2,2,5);sand.step();}sand.settle();assert.equal(count(),n);assert(sand.cells.slice(20*60,38*60).some(Boolean));for(let y=0;y<39;y++)for(let x=0;x<60;x++)if(sand.cells[y*60+x])assert(sand.cells[(y+1)*60+x]);});
+test('undo snapshots remain independent and restore the exact layered pile',()=>{const snapshot=sand.snapshot();sand.clear();assert.equal(count(),0);sand.restore(snapshot);sand.settle();assert.deepEqual(sand.cells,snapshot);});
+test('memory is fixed even when full and mirror stays within bounds',()=>{const small=new Sand(12,8);for(let i=0;i<200;i++){small.pour(0,0,1,6,15,true);small.step();}small.settle();assert.equal(small.cells.length,96);assert(small.cells.every(x=>x===0||x===1));});
+test('draft validator rejects bad schemas and bounds hostile persisted input',()=>{assert.throws(()=>Core.validate({}));const s=Core.validate({...Core.empty(),phase:'plan',title:'a'.repeat(1000),steps:Array(30).fill({text:'hello',done:'yes'}),index:999,remaining:-20,barrier:99});assert.equal(s.steps.length,8);assert.equal(s.title.length,300);assert.equal(s.index,7);assert.equal(s.remaining,0);assert.equal(s.steps[0].done,false);assert.equal(s.barrier,0);});
+test('step completion skips completed actions and ends only after every step',()=>{const s=Core.empty();s.phase='plan';s.steps=[{text:'one',done:false},{text:'two',done:true},{text:'three',done:false}];Core.complete(s);assert.equal(s.index,2);assert.equal(s.phase,'plan');Core.complete(s);assert.equal(s.phase,'review');});
+test('saved timer extensions and next-step notes survive reload',()=>{const s=Core.empty();s.phase='plan';s.steps=[{text:'one',done:false}];s.remaining=800;s.note='Continue from paragraph two';assert.equal(Core.validate(JSON.parse(JSON.stringify(s))).remaining,800);assert.equal(Core.validate(s).note,s.note);});
+console.log(tests+' gravity and small-step checks passed.');

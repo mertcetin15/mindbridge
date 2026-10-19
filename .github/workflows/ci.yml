@@ -1,0 +1,55 @@
+name: MindBridge checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: mindbridge_test
+          POSTGRES_USER: mindbridge
+          POSTGRES_PASSWORD: test-only-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U mindbridge -d mindbridge_test"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      TEST_DATABASE_URL: postgresql+psycopg://mindbridge:test-only-password@localhost:5432/mindbridge_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: python -m pip install -r requirements-dev.txt
+      - run: npm ci --ignore-scripts
+      - run: python build_frontend.py
+      - run: python -m pytest -q
+      - run: npm test
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run test:e2e
+        if: github.ref != 'refs/heads/codex/scroll-cinema'
+      - run: npm run test:e2e -- --grep 'cinematic|campus home'
+        if: github.ref == 'refs/heads/codex/scroll-cinema' 
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-failure-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cinematic-qa
+          path: cinematic-qa/
+          if-no-files-found: ignore
+          retention-days: 3

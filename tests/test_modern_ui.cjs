@@ -1,0 +1,35 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const nodes=new Map(),events={},observers=[],storage=new Map();let doc,animations=0,cancelled=0;
+class E{
+ constructor(tag='div'){this.tagName=tag.toUpperCase();this.children=[];this.dataset={};this.attrs={};this.handlers={};this.textContent='';this.value='';this.isConnected=true;const classes=new Set();this.classList={add:x=>classes.add(x),remove:x=>classes.delete(x),contains:x=>classes.has(x),toggle:x=>classes.has(x)?classes.delete(x):classes.add(x)};}
+ set id(v){this._id=v;nodes.set(v,this);}get id(){return this._id;}
+ append(...items){for(const i of items){i.parent=this;this.children.push(i);}}prepend(n){n.parent=this;this.children.unshift(n);}replaceChildren(...n){this.children=[];this.append(...n);}
+ setAttribute(k,v){this.attrs[k]=v;}removeAttribute(k){delete this.attrs[k];}
+ addEventListener(k,f){(this.handlers[k]??=[]).push(f);}fire(k,e={}){for(const f of this.handlers[k]||[])f({target:this,preventDefault(){},...e});}click(){this.fire('click');}focus(){doc.activeElement=this;}scrollIntoView(){this.scrolled=true;}
+ querySelectorAll(s){let found=[];for(const c of this.children){if(s.split(',').includes(c.tagName.toLowerCase()))found.push(c);found.push(...c.querySelectorAll(s));}return found;}querySelector(s){return this.querySelectorAll(s)[0]||null;}
+ contains(el){return this===el||this.children.some(c=>c.contains(el));}closest(){return this.parent;}animate(){animations++;return {cancel(){cancelled++;}};}
+ showModal(){this.open=true;}close(){this.open=false;this.fire('close');}
+}
+function el(id,tag='div'){const n=new E(tag);n.id=id;return n;}
+const body=new E('body'),nav=el('navbar'),links=new E(),right=new E(),hero=new E();body.append(nav,hero);nav.append(links,right);
+for(const id of ['hamburger-btn','lang-btn','theme-toggle'])nav.append(el(id,'button'));
+nav.append(el('lang-switch'));for(const id of ['page-home','page-tools','mb-focus-plan','mb-planner','sos-modal','dark-room-overlay'])body.append(el(id));nodes.get('dark-room-overlay').append(new E('button'));
+const cards=[new E(),new E()];for(const [i,id] of ['breath-circle','timer-circle'].entries()){const h=new E('h3');h.textContent=i?'Focus timer':'Breathing';cards[i].append(h,el(id));body.append(cards[i]);}body.append(el('time-display'));nodes.get('time-display').textContent='25:00';
+for(const page of ['home','tools']){const n=new E('button');n.dataset.page=page;n.textContent=page;links.append(n);}
+const motion={matches:false,addEventListener(k,f){this.change=f;}};
+doc={body,documentElement:{lang:'en',dataset:{},removeAttribute(){}},activeElement:hero,createElement:t=>new E(t),getElementById:id=>nodes.get(id),querySelector:s=>({'.nav-links':links,'.nav-right':right,'.hero-inner':hero}[s]),querySelectorAll:s=>s==='.nav-link[data-page]'?links.children:s==='.tool-card'?cards:[],addEventListener:(k,f)=>(events[k]??=[]).push(f),getAnimations:()=>[]};
+const ctx={document:doc,matchMedia:()=>motion,localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},WeakMap,MutationObserver:class{constructor(f){this.f=f;}observe(el){observers.push({el,f:this.f});}},setTimeout:()=>0,showPage(id){ctx.page=id;},applyI18n(){},toggleMobileNav(){links.classList.toggle('mobile-open');},toggleLangMenu(force){if(force===false)nodes.get('lang-switch').classList.remove('open');else nodes.get('lang-switch').classList.toggle('open');},toggleDarkRoom(show){nodes.get('dark-room-overlay').classList[show?'add':'remove']('active');},addEventListener:(k,f)=>(events[k]??=[]).push(f)};ctx.window=ctx;
+vm.createContext(ctx);vm.runInContext(fs.readFileSync('frontend/modern-ui.js','utf8'),ctx);
+let n=0;function test(name,f){f();n++;console.log('PASS '+name);}const $=id=>nodes.get(id);const dispatch=(k,e)=>events[k]?.forEach(f=>f(e));
+test('quick navigation resolves immediately and rejects nonexistent pages',()=>{ctx.showPage('tools');ctx.showPage('home');assert.equal(ctx.page,'home');ctx.showPage('absent');assert.equal(ctx.page,'home');});
+test('search opens with input focus and excludes private notes',()=>{$('mb-search-open').focus();$('mb-search-open').click();assert($('mb-search').open);assert.equal(doc.activeElement,$('mb-search-input'));assert.equal($('mb-search-results').children.length,7);});
+test('search filters real tool names and supports a no-result state',()=>{$('mb-search-input').value='breathing';$('mb-search-input').fire('input');assert.equal($('mb-search-results').children.length,1);$('mb-search-input').value='not-a-tool';$('mb-search-input').fire('input');assert.equal($('mb-search-results').children.length,0);assert.equal($('mb-search-count').textContent,'No matching tools.');});
+test('closing search restores its opener',()=>{$('mb-search-close').click();assert.equal(doc.activeElement,$('mb-search-open'));});
+test('result activation goes to and focuses the real tool',()=>{$('mb-search-open').click();$('mb-search-input').value='breathing';$('mb-search-input').fire('input');$('mb-search-results').children[0].click();assert(!$('mb-search').open);assert.equal(ctx.page,'tools');assert.equal(doc.activeElement,cards[0]);assert(cards[0].scrolled);});
+test('session ribbon mirrors timer state without inventing elapsed time',()=>{dispatch('mb:focus-state',{detail:{state:'running'}});assert(!$('mb-session').hidden);$('time-display').textContent='24:42';observers.find(o=>o.el===$('time-display')).f();assert.equal($('mb-session-time').textContent,'24:42');dispatch('mb:focus-state',{detail:{state:'paused'}});assert.equal($('mb-session-label').textContent,'Session paused');$('mb-session-back').click();assert.equal(doc.activeElement,cards[1]);dispatch('mb:focus-state',{detail:{state:'complete'}});assert($('mb-session').hidden);});
+test('reduced motion keeps navigation functional without animations',()=>{motion.matches=true;const before=animations;ctx.showPage('home');assert.equal(animations,before);assert.equal(ctx.page,'home');});
+test('Escape closes mobile menu and restores menu button focus',()=>{ctx.toggleMobileNav();assert.equal($('hamburger-btn').attrs['aria-expanded'],'true');dispatch('keydown',{key:'Escape'});assert(!links.classList.contains('mobile-open'));assert.equal(doc.activeElement,$('hamburger-btn'));});
+test('Escape restores focus from the language menu',()=>{ctx.toggleLangMenu();dispatch('keydown',{key:'Escape'});assert.equal(doc.activeElement,$('lang-btn'));assert.equal($('lang-btn').attrs['aria-expanded'],'false');});
+test('dark room isolates background and restores focus on exit',()=>{$('mb-search-open').focus();ctx.toggleDarkRoom(true);assert(nav.inert);assert(!$('dark-room-overlay').inert);dispatch('keydown',{key:'Escape'});assert(!nav.inert);assert($('dark-room-overlay').inert);assert.equal(doc.activeElement,$('mb-search-open'));});
+test('new controls translate without losing the timer state',()=>{doc.documentElement.lang='tr';ctx.applyI18n();assert.equal($('mb-search-title').textContent,'Araç bul');assert.equal($('mb-session-back').textContent,'Oturuma dön');});
+console.log(`${n} modern UI behavior checks passed (simulated DOM; no browser layout claim).`);

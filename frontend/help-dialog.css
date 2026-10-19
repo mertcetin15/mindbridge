@@ -1,0 +1,1 @@
+#sos-modal{opacity:0;pointer-events:none}#sos-modal.active{opacity:1;pointer-events:auto}.sos-content{transform:translateY(30px)}#sos-modal.active .sos-content{transform:translateY(0)}.sos-number:hover{opacity:.9;transform:scale(1.02)}.sos-close:hover{background:var(--bg2)}

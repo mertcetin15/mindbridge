@@ -1,0 +1,8 @@
+/* Small-step state, independent of DOM and providers. */
+(function(root){'use strict';
+const clean=v=>typeof v==='string'?v.trim().slice(0,300):'';
+function empty(){return {version:1,title:'',category:0,barrier:0,minutes:5,steps:[],index:0,remaining:300,phase:'setup',note:'',sessions:[]};}
+function validate(raw){if(!raw||raw.version!==1||!['setup','plan','review'].includes(raw.phase))throw Error('Invalid plan');const s=empty();s.title=clean(raw.title);s.note=clean(raw.note);s.category=Number.isInteger(raw.category)&&raw.category>=0&&raw.category<5?raw.category:0;s.barrier=Number.isInteger(raw.barrier)&&raw.barrier>=0&&raw.barrier<4?raw.barrier:0;s.minutes=[2,5,10,15].includes(raw.minutes)?raw.minutes:5;s.steps=Array.isArray(raw.steps)?raw.steps.slice(0,8).map(x=>({text:clean(x.text),done:x.done===true})).filter(x=>x.text):[];s.index=Math.max(0,Math.min(s.steps.length-1,Number.isInteger(raw.index)?raw.index:0));s.remaining=Number.isFinite(raw.remaining)?Math.max(0,Math.min(1800,raw.remaining)):s.minutes*60;s.phase=s.steps.length?raw.phase:'setup';s.sessions=Array.isArray(raw.sessions)?raw.sessions.slice(-20).filter(x=>x&&typeof x.date==='string'&&['started','progress','finished'].includes(x.outcome)).map(x=>({date:x.date.slice(0,30),outcome:x.outcome})):[];return s;}
+function complete(s){if(s.steps[s.index])s.steps[s.index].done=true;const next=s.steps.findIndex(x=>!x.done);if(next<0)s.phase='review';else s.index=next;}
+root.MBStartCore={empty,validate,complete};if(typeof module!=='undefined')module.exports=root.MBStartCore;
+})(typeof window!=='undefined'?window:globalThis);

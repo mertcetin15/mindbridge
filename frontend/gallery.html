@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>MindBridge component gallery</title>
+<link rel="stylesheet" href="/assets/base.css?v=a3e8b77a4ef8">
+<link rel="stylesheet" href="/assets/polish.css?v=9b0eac2eb1f9">
+<link rel="stylesheet" href="/assets/dark-room.css?v=426a31c334d2">
+<link rel="stylesheet" href="/assets/help-dialog.css?v=b7e576f35911">
+<link rel="stylesheet" href="/assets/records.css?v=7fd3056d5093">
+<link rel="stylesheet" href="/assets/tools.css?v=9a432609b7e4">
+<link rel="stylesheet" href="/assets/chat.css?v=20d4172b823c">
+<link rel="stylesheet" href="/assets/accounts.css?v=3e09fa2a031d">
+<link rel="stylesheet" href="/assets/focus.css?v=49f1d73d538e">
+<link rel="stylesheet" href="/assets/accessibility.css?v=983d665dc920">
+<link rel="stylesheet" href="/assets/planner.css?v=1b4dad6c4dd7">
+<link rel="stylesheet" href="/assets/studio.css?v=c4dc9d07b074">
+<link rel="stylesheet" href="/assets/balance.css?v=76ed8b210497">
+<link rel="stylesheet" href="/assets/campus.css?v=45faa2ec4191">
+<link rel="stylesheet" href="/assets/campus-desk.css?v=808faa834040">
+<link rel="stylesheet" href="/assets/edition.css?v=69529bfaf48a">
+<link rel="stylesheet" href="/assets/start.css?v=55998c518926">
+<link rel="stylesheet" href="/assets/cinematic.css?v=c326597fc363">
+<link rel="stylesheet" href="/assets/living-details.css?v=95047094cca8">
+<link rel="stylesheet" href="/assets/garden-world.css?v=5283c2c5eaf3">
+<link rel="stylesheet" href="/assets/workspace.css?v=7de1336d88f2">
+<link rel="stylesheet" href="/assets/minimal-ui.css?v=094cf588959b">
+<link rel="stylesheet" href="/assets/product-ui.css?v=2880e3023201">
+<link rel="stylesheet" href="/assets/refined-ui.css?v=c0c519e73294">
+<link rel="stylesheet" href="/assets/next-step.css?v=99425bb83f85">
+<link rel="stylesheet" href="/assets/breath.css?v=52cef3507adc">
+<link rel="stylesheet" href="/assets/paper.css?v=93eb20bde445">
+
+<style>
+/* Gallery layout only. Components below use the real stylesheets, unchanged. Transitions are off so that
+   styles read the instant a theme changes. */
+*,*::before,*::after{transition:none!important;animation:none!important}
+body{margin:0;padding:24px;background:var(--bg);color:var(--ink);font-family:var(--sans)}
+.g-wrap{max-width:1100px;margin:0 auto}
+.g-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 20px}
+.g-note{font-size:13px;color:var(--ink2);max-width:640px;line-height:1.6}
+.g-section{margin:0 0 36px}
+.g-section>h2.g-title{font:600 12px/1.4 'Courier New',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid var(--border2);padding-bottom:8px;margin:0 0 16px}
+.g-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.g-cell{min-width:0}
+.g-label{display:block;font:11px/1.4 'Courier New',monospace;color:var(--ink3);margin:0 0 6px}
+.g-swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.g-swatch{display:flex;align-items:center;gap:8px;font:12px/1.3 var(--sans)}
+.g-chip{width:28px;height:28px;border:1px solid var(--border);border-radius:var(--r)}
+</style>
+</head>
+<body>
+<div class="g-wrap">
+ <h1>Component gallery</h1>
+ <p class="g-note">Development only: this page is not served in production and is not part of the shipped site. It shows the shared components, their states and the exceptions, drawn by the real stylesheets, so a change to the styles can be seen and compared. Samples marked <em>global</em> sit outside any page scope; the others sit inside the scope the real page gives them.</p>
+ <div class="g-bar">
+  <button type="button" class="btn-outline" id="g-light">Light</button>
+  <button type="button" class="btn-outline" id="g-dark">Dark</button>
+  <span class="g-note" id="g-status" role="status"></span>
+ </div>
+
+ <div id="page-tools">
+  <section class="g-section">
+   <h2 class="g-title">Buttons · tools scope</h2>
+   <div class="g-grid">
+    <div class="g-cell"><span class="g-label">primary</span><button type="button" class="btn-solid" data-sample="btn-primary">Primary</button></div>
+    <div class="g-cell"><span class="g-label">secondary</span><button type="button" class="btn-outline" data-sample="btn-secondary">Secondary</button></div>
+    <div class="g-cell"><span class="g-label">small</span><button type="button" class="btn-sm" data-sample="btn-small">Small</button></div>
+    <div class="g-cell"><span class="g-label">destructive (.mb-danger)</span><button type="button" class="btn-outline mb-danger" data-sample="btn-danger">Delete account</button></div>
+    <div class="g-cell"><span class="g-label">destructive (planner remove)</span><button type="button" class="btn-outline" data-copy="remove" data-sample="btn-remove">Delete</button></div>
+    <div class="g-cell"><span class="g-label">disabled primary</span><button type="button" class="btn-solid" disabled data-sample="btn-primary-disabled">Primary</button></div>
+    <div class="g-cell"><span class="g-label">disabled secondary</span><button type="button" class="btn-outline" disabled data-sample="btn-secondary-disabled">Secondary</button></div>
+    <div class="g-cell" aria-busy="true"><span class="g-label">pending (inside aria-busy)</span><button type="button" class="btn-solid" disabled data-sample="btn-pending">Saving</button></div>
+   </div>
+  </section>
+
+  <section class="g-section">
+   <h2 class="g-title">Fields · tools scope</h2>
+   <div class="g-grid">
+    <div class="g-cell"><span class="g-label">text</span><input type="text" value="Sample text" data-sample="field-text" aria-label="text sample"></div>
+    <div class="g-cell"><span class="g-label">select</span><select data-sample="field-select" aria-label="select sample"><option>Option one</option></select></div>
+    <div class="g-cell"><span class="g-label">textarea</span><textarea data-sample="field-textarea" aria-label="textarea sample">Sample text</textarea></div>
+    <div class="g-cell"><span class="g-label">error, text</span><input type="text" value="Not valid" aria-invalid="true" data-sample="field-invalid-text" aria-label="invalid text sample"></div>
+    <div class="g-cell"><span class="g-label">error, number</span><input type="number" class="timer-min-input" value="0" aria-invalid="true" data-sample="field-invalid-number" aria-label="invalid number sample"></div>
+    <div class="g-cell"><span class="g-label">disabled</span><input type="text" value="Disabled" disabled data-sample="field-disabled" aria-label="disabled sample"></div>
+   </div>
+  </section>
+
+  <section class="g-section">
+   <h2 class="g-title">Chips and toggles · tools scope</h2>
+   <div class="g-grid">
+    <div class="g-cell"><span class="g-label">welcome chip, off</span><button type="button" class="mb-welcome-chip" aria-pressed="false" data-sample="chip-off">I have no energy</button></div>
+    <div class="g-cell"><span class="g-label">welcome chip, on</span><button type="button" class="mb-welcome-chip" aria-pressed="true" data-sample="chip-on">I have no energy</button></div>
+    <div class="g-cell"><span class="g-label">prompt style, off</span><button type="button" class="mb-desk-tone" aria-pressed="false" data-sample="tone-off">Reflective</button></div>
+    <div class="g-cell"><span class="g-label">prompt style, on</span><button type="button" class="mb-desk-tone" aria-pressed="true" data-sample="tone-on">Reflective</button></div>
+    <div class="g-cell"><span class="g-label">simplify, off</span><button type="button" class="mb-simplify" aria-pressed="false" data-sample="simplify-off">Simplify</button></div>
+    <div class="g-cell"><span class="g-label">simplify, on</span><button type="button" class="mb-simplify" aria-pressed="true" data-sample="simplify-on">Simplify</button></div>
+   </div>
+  </section>
+
+  <section class="g-section">
+   <h2 class="g-title">Panels and states · tools scope</h2>
+   <div class="g-grid">
+    <div class="g-cell"><span class="g-label">save state: unsaved</span><p class="mb-save-state" data-state="unsaved" data-sample="save-unsaved">✎ Not saved yet. This text stays only on this open page until you press Save.</p></div>
+    <div class="g-cell"><span class="g-label">save state: saving</span><p class="mb-save-state" data-state="saving" data-sample="save-saving">… Saving…</p></div>
+    <div class="g-cell"><span class="g-label">save state: saved</span><p class="mb-save-state" data-state="saved" data-sample="save-saved">✓ Saved in this browser. (Last confirmed 10:42)</p></div>
+    <div class="g-cell"><span class="g-label">save state: failed</span><p class="mb-save-state" data-state="failed" data-sample="save-failed">! Could not save. Your text is still here; you can try again.</p></div>
+    <div class="g-cell"><span class="g-label">reminder ready</span><div class="mb-reminder-ready-item" data-sample="reminder-ready"><strong>Reminder ready</strong><p>For: Write the introduction</p></div></div>
+    <div class="g-cell"><span class="g-label">welcome card</span><div class="mb-welcome-tour" data-sample="welcome-card"><h2>A quick look around</h2><p class="mb-welcome-intro">Nothing here asks anything about you.</p></div></div>
+   </div>
+  </section>
+
+  <section class="g-section">
+   <h2 class="g-title">Timer dial · tools scope</h2>
+   <div class="g-grid">
+    <div class="g-cell"><span class="g-label">dial (hairline track, 12 ticks)</span><div class="timer-container" data-sample="timer-dial"><div class="timer-circle" style="--p:100"></div><div class="timer-inner"><div class="time-display">05:00</div></div></div></div>
+   </div>
+  </section>
+ </div>
+
+ <div id="page-library">
+  <section class="g-section">
+   <h2 class="g-title">Cards · library scope</h2>
+   <div class="g-grid">
+    <div class="g-cell"><span class="g-label">guide card</span><article class="mb-field-card" data-sample="card-guide"><p class="mb-ed-label">01 / Study &amp; focus · 5 min</p><h2>The assignment you cannot start</h2><p class="mb-field-why">Matches in: title</p><p>The document is open. The first sentence is not there.</p></article></div>
+    <div class="g-cell"><span class="g-label">empty result</span><div class="mb-field-empty" data-sample="card-empty"><p>No guide matches “xyz”.</p><p class="mb-field-hint">Try fewer or shorter words, or clear the filters.</p></div></div>
+   </div>
+  </section>
+ </div>
+
+ <section class="g-section">
+  <h2 class="g-title">Global scope (outside any page)</h2>
+  <div class="g-grid">
+   <div class="g-cell"><span class="g-label">global primary</span><button type="button" class="btn-solid" data-sample="global-btn-primary">Primary</button></div>
+   <div class="g-cell"><span class="g-label">global secondary</span><button type="button" class="btn-outline" data-sample="global-btn-secondary">Secondary</button></div>
+   <div class="g-cell"><span class="g-label">global disabled</span><button type="button" class="btn-solid" disabled data-sample="global-btn-disabled">Primary</button></div>
+   <div class="g-cell"><span class="g-label">global text field</span><input type="text" value="Sample text" data-sample="global-field-text" aria-label="global text sample"></div>
+   <div class="g-cell"><span class="g-label">global error field</span><input type="text" value="Not valid" aria-invalid="true" data-sample="global-field-invalid" aria-label="global invalid sample"></div>
+  </div>
+ </section>
+
+ <section class="g-section">
+  <h2 class="g-title">Icons</h2>
+  <div class="g-grid">
+   <div class="g-cell"><span class="g-label">moon 22px</span><span style="font-size:22px"><svg class="mb-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" data-sample="icon-moon"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.2 8.2 0 1 0 20 14.2z"/></svg></span></div>
+   <div class="g-cell"><span class="g-label">heart 40px</span><span style="font-size:40px;color:var(--g)"><svg class="mb-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" data-sample="icon-heart"><path d="M12 20s-7.5-4.6-7.5-10A4.4 4.4 0 0 1 12 7.1 4.4 4.4 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/></svg></span></div>
+   <div class="g-cell"><span class="g-label">camera 40px</span><span style="font-size:40px;color:var(--g)"><svg class="mb-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" data-sample="icon-camera"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><path d="M12 10.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"/></svg></span></div>
+  </div>
+ </section>
+
+ <section class="g-section">
+  <h2 class="g-title">Type</h2>
+  <div class="g-grid">
+   <div class="g-cell"><span class="g-label">h1</span><h1 data-sample="type-h1">Heading one</h1></div>
+   <div class="g-cell"><span class="g-label">h2</span><h2 data-sample="type-h2">Heading two</h2></div>
+   <div class="g-cell"><span class="g-label">h3</span><h3 data-sample="type-h3">Heading three</h3></div>
+   <div class="g-cell"><span class="g-label">body</span><p data-sample="type-body">Body text sits at a readable size and line height.</p></div>
+   <div class="g-cell"><span class="g-label">editorial label</span><p class="mb-ed-label" data-sample="type-label">03 / Tools</p></div>
+  </div>
+ </section>
+
+ <section class="g-section">
+  <h2 class="g-title">Colour tokens</h2>
+  <div class="g-swatches" id="g-tokens"></div>
+ </section>
+</div>
+<script id="mindbridge-gallery" src="/assets/gallery.js?v=bed5bb0c6308" defer></script>
+</body>
+</html>
