@@ -39,7 +39,8 @@ test('the browser Back button goes to the previous page and does not add history
  const h=harness();h.ctx.showPage('library');h.ctx.showPage('tools');h.hist.length=0;h.log.length=0;
  h.pop({mb:'library'},'#/library');assert.equal(h.log[h.log.length-1],'library');assert.equal(h.hist.length,0);
  h.pop(null,'#/quiz');assert.equal(h.log[h.log.length-1],'quiz','without state the address decides');
- h.pop(null,'');assert.equal(h.log[h.log.length-1],'home','an empty address means home');
+ const before=h.log.length;h.pop(null,'#main-content');assert.equal(h.log.length,before,'the skip link (#main-content) does not change the page');
+ h.pop(null,'');assert.equal(h.log.length,before,'an empty address with no state changes nothing');
  h.ctx.showPage('tools');assert.equal(h.hist[h.hist.length-1][0],'push','normal navigation works again after Back');
 });
 test('a page can be opened from its address at load; an unknown address opens home and is replaced',()=>{

@@ -1267,7 +1267,7 @@ label:has(>input[type=checkbox]){display:flex;align-items:flex-start;gap:10px;mi
 </style>
 </head>
 <body>
-<a class="mb-skip" href="#main-content">Skip to content</a>
+<a class="mb-skip" href="#main-content" tabindex="0">Skip to content</a>
 <div id="particles-container"></div>
 <div id="orbit-bg">
   <div class="orbit-ring"></div><div class="orbit-ring"></div><div class="orbit-ring"></div><div class="orbit-ring"></div>
@@ -7153,7 +7153,9 @@ window.showPage=function(id){
  return result;
 };
 window.addEventListener('popstate',event=>{
- const page=(event.state&&event.state.mb)||J.routeFromHash(location.hash)||'home';
+ const page=(event.state&&event.state.mb)||J.routeFromHash(location.hash);
+ // A plain in-page anchor (the skip link, #main-content) also fires popstate. It is not one of our pages: leave the page alone.
+ if(!page)return;
  applying=true;try{go(page);}finally{applying=false;}
  current=page;
 });

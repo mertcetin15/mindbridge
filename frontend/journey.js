@@ -16,7 +16,9 @@ window.showPage=function(id){
  return result;
 };
 window.addEventListener('popstate',event=>{
- const page=(event.state&&event.state.mb)||J.routeFromHash(location.hash)||'home';
+ const page=(event.state&&event.state.mb)||J.routeFromHash(location.hash);
+ // A plain in-page anchor (the skip link, #main-content) also fires popstate. It is not one of our pages: leave the page alone.
+ if(!page)return;
  applying=true;try{go(page);}finally{applying=false;}
  current=page;
 });
