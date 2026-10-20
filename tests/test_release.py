@@ -10,13 +10,13 @@ from backend.migrate import migrate_engine, check_engine
 def test_migrate_new_and_repeated(tmp_path):
     db=Database('sqlite+pysqlite:///'+str(tmp_path/'new.db'))
     migrate_engine(db.engine);migrate_engine(db.engine);check_engine(db.engine)
-    assert set(inspect(db.engine).get_table_names())=={'users','entries','login_sessions','schema_version','alembic_version','planners','recovery_codes'}
+    assert set(inspect(db.engine).get_table_names())=={'users','entries','login_sessions','schema_version','alembic_version','planners','recovery_codes','user_emails','email_tokens'}
     db.close()
 
 
 def test_adopt_legacy_preserves_records(tmp_path):
     db=Database('sqlite+pysqlite:///'+str(tmp_path/'legacy.db'))
-    Base.metadata.create_all(db.engine,tables=[t for t in Base.metadata.sorted_tables if t.name not in ("planners","recovery_codes")])
+    Base.metadata.create_all(db.engine,tables=[t for t in Base.metadata.sorted_tables if t.name not in ("planners","recovery_codes","user_emails","email_tokens")])
     with db.Session.begin() as session: session.add(SchemaVersion(id=1,version=1))
     _,token=db.register('legacy','long-test-password')
     db.save_entries(token,[{'client_id':'original','type':'journal','text':'Keep my draft'}])
@@ -35,7 +35,7 @@ def test_migration_refuses_unknown_schema(tmp_path):
 
 def test_migration_refuses_future_version(tmp_path):
     db=Database('sqlite+pysqlite:///'+str(tmp_path/'future.db'))
-    Base.metadata.create_all(db.engine,tables=[t for t in Base.metadata.sorted_tables if t.name not in ("planners","recovery_codes")])
+    Base.metadata.create_all(db.engine,tables=[t for t in Base.metadata.sorted_tables if t.name not in ("planners","recovery_codes","user_emails","email_tokens")])
     with db.Session.begin() as session:session.add(SchemaVersion(id=1,version=99))
     with pytest.raises(RuntimeError,match='Unsupported'):migrate_engine(db.engine)
     assert 'alembic_version' not in inspect(db.engine).get_table_names()

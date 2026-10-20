@@ -67,7 +67,7 @@ Compared byte-for-byte (line endings normalised) with the zip before the final p
 
 ## 5. Deployment notes
 
-New optional environment variables (all have safe defaults): `LOGIN_FAILURE_LIMIT` (default 10, range 3-100), `AI_DAILY_QUOTA` (default 200, 0 disables), `AI_ENABLED` (default on; `0`, `false`, `off`, `no` turn AI replies off). Existing: `APP_ENV`, `PUBLIC_ORIGIN`, `DATABASE_URL`, `GROQ_API_KEY`, `GROQ_MODEL`, `AI_REQUIRE_LOGIN`, `COOKIE_SECURE`, `TRUST_PROXY_HOPS`. No new service. **One new Alembic revision, `0003` (table `recovery_codes`), must be applied** (`python -m backend.migrate`, which `serve.py` also runs at start). Planner step states are stored inside the existing planner data (older clients send only `done`; the state is derived). The `/__gallery` page exists only when `APP_ENV` is not `production`. Back up the database before upgrading. Nothing was deployed from this work.
+New optional environment variables (all have safe defaults; the `SMTP_*` group turns on account email only when `SMTP_HOST` and `SMTP_FROM` are set, see `docs/DEPLOYMENT.md`): `LOGIN_FAILURE_LIMIT` (default 10, range 3-100), `AI_DAILY_QUOTA` (default 200, 0 disables), `AI_ENABLED` (default on; `0`, `false`, `off`, `no` turn AI replies off). Existing: `APP_ENV`, `PUBLIC_ORIGIN`, `DATABASE_URL`, `GROQ_API_KEY`, `GROQ_MODEL`, `AI_REQUIRE_LOGIN`, `COOKIE_SECURE`, `TRUST_PROXY_HOPS`. No new service. **Two new Alembic revisions, `0003` (table `recovery_codes`) and `0004` (tables `user_emails`, `email_tokens`), must be applied** (`python -m backend.migrate`, which `serve.py` also runs at start). Planner step states are stored inside the existing planner data (older clients send only `done`; the state is derived). The `/__gallery` page exists only when `APP_ENV` is not `production`. Back up the database before upgrading. Nothing was deployed from this work.
 
 ## 6. Remaining work
 
@@ -75,7 +75,7 @@ New optional environment variables (all have safe defaults): `LOGIN_FAILURE_LIMI
 |---|---|
 | High | Run the PostgreSQL tests, the Docker build and the e2e suite in CI; read the first real CI result. |
 | High | Have a person review the crisis resource list and set its review date. |
-| Medium | Decide whether to add an email address for password reset in addition to the recovery code (a product and privacy decision). |
+| Medium | Choose a mail provider, set the `SMTP_*` variables, sign mail for your domain (SPF, DKIM) and add the provider to the privacy text. Email reset was built and tested end to end against a local SMTP sink only. |
 | Medium | Shared rate-limit and quota storage if more than one process will run. |
 | Medium | Decide whether Grounding and Take a break return; the calm options only offer reachable tools. |
 | Medium | Real-device, screen-reader and 200%-zoom passes. |

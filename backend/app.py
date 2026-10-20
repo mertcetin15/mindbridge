@@ -313,7 +313,7 @@ def create_app(settings: Settings | None = None, provider=None) -> FastAPI:
 
     @app.get('/api/health')
     async def health():
-        return {'status': 'ok', 'ai_configured': bool(settings.api_key and settings.model), 'ai_enabled': settings.ai_enabled, 'live_verified': False, 'provider': 'groq', 'version': '4.0.0', 'release': '19.0.0', 'ai_requires_login': settings.require_ai_login}
+        return {'status': 'ok', 'ai_configured': bool(settings.api_key and settings.model), 'ai_enabled': settings.ai_enabled, 'live_verified': False, 'provider': 'groq', 'version': '4.0.0', 'release': '19.0.0', 'ai_requires_login': settings.require_ai_login, 'mail_enabled': bool(getattr(app.state, 'mailer', None) and app.state.mailer.enabled)}
 
     @app.post('/api/chat')
     async def chat(request: Request):

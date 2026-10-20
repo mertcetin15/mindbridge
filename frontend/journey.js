@@ -23,5 +23,7 @@ window.addEventListener('popstate',event=>{
  current=page;
 });
 const start=J.routeFromHash(location.hash);
-if(start&&start!=='home'){go(start);}else{current='home';remember('home',true);}
+// A #verify=... or #reset=... link carries a token for email-ui.js: leave the address alone so it can read it once.
+if(/^#(verify|reset)=/.test(location.hash)){current='home';}
+else if(start&&start!=='home'){go(start);}else{current='home';remember('home',true);}
 })();

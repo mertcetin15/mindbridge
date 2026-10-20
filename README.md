@@ -135,7 +135,7 @@ Guest plans stay in this browser under a separate planner key. Account plans sta
 
 Revision checks reject stale account updates; a conflict asks you to copy your draft, refresh and reapply it. The app does not silently merge simultaneous edits. Guest storage also checks for changes in other tabs and preserves malformed data instead of overwriting it.
 
-Back up your existing database before upgrading: revision 0002 adds the planner table and revision 0003 adds the recovery-code table, without changing account or journal rows. Local startup applies it automatically. Keep the old backup if you need to return to an older release.
+Back up your existing database before upgrading: revision 0002 adds the planner table and revision 0003 adds the recovery-code table and revision 0004 adds the optional account-email tables, without changing account or journal rows. Local startup applies it automatically. Keep the old backup if you need to return to an older release.
 
 ## What works
 

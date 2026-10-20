@@ -5,13 +5,14 @@ import re
 import time
 from typing import Literal
 
-from fastapi import HTTPException, Request, Query
+from fastapi import BackgroundTasks, HTTPException, Request, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.concurrency import run_in_threadpool
 
 from .limits import SlidingWindowLimiter, client_key
+from .mailer import Mailer
 from .database import COOKIE, SESSION_SECONDS, DomainError, csrf_for
 
 class StrictBody(BaseModel): model_config=ConfigDict(extra='forbid',strict=True)
@@ -68,6 +69,24 @@ class RecoverBody(StrictBody):
         if not v.strip(): raise ValueError('Blank password')
         return v
 
+class EmailSet(StrictBody):
+    password: str = Field(min_length=1,max_length=128)
+    email: str = Field(min_length=3,max_length=254)
+
+class TokenBody(StrictBody):
+    token: str = Field(min_length=20,max_length=64,pattern=r'^[A-Za-z0-9_-]+$')
+
+class ForgotBody(StrictBody):
+    email: str = Field(min_length=1,max_length=254)
+
+class ResetBody(TokenBody):
+    new_password: str = Field(min_length=12,max_length=128)
+    @field_validator('new_password')
+    @classmethod
+    def not_blank(cls,v):
+        if not v.strip(): raise ValueError('Blank password')
+        return v
+
 class PasswordAction(StrictBody):
     password: str = Field(min_length=1,max_length=128)
 class PasswordChange(PasswordAction):
@@ -86,7 +105,13 @@ def attach_accounts(app,settings):
     # reveals whether an account exists. Trade-off: someone can deliberately lock a name for the window.
     failure_limiter=SlidingWindowLimiter(settings.login_failures,window=900.0)
 
+    app.state.mailer=Mailer.from_env()
+    # At most five reset emails per address per hour, counted for known and unknown addresses alike.
+    forgot_limiter=SlidingWindowLimiter(5,window=3600.0)
+
     def token(request): return request.cookies.get(COOKIE)
+
+    def origin_for(request): return (settings.public_origin if settings.production else str(request.base_url).rstrip('/')).rstrip('/')
 
     def csrf(request):
         raw=token(request)
@@ -183,6 +208,64 @@ def attach_accounts(app,settings):
         failure_limiter.reset(key)
         response=cookie_reply(result,new_token)
         response.headers['Cache-Control']='no-store'
+        return response
+
+    def need_mail(request):
+        if not request.app.state.mailer.enabled: raise HTTPException(503,'email_unavailable')
+
+    @app.post('/api/auth/email')
+    async def email_set(request:Request,background:BackgroundTasks):
+        from .email_accounts import set_email
+        rate_auth(request);data=await read(request,EmailSet);csrf(request);need_mail(request)
+        verify_token,address=await run_in_threadpool(set_email,request.app.state.database,token(request),data.password,data.email)
+        if verify_token:
+            link=origin_for(request)+'/#verify='+verify_token
+            background.add_task(request.app.state.mailer.send,address,'Confirm your MindBridge email','Open this link to confirm this address for password resets. It works once and expires in 24 hours:\n\n'+link+'\n\nIf you did not ask for this, ignore this message and nothing changes.')
+        response=JSONResponse({'ok':True,'sent':bool(verify_token)});response.headers['Cache-Control']='no-store'
+        return response
+
+    @app.post('/api/auth/email/remove')
+    async def email_remove(request:Request):
+        from .email_accounts import remove_email
+        rate_auth(request);data=await read(request,PasswordAction);csrf(request)
+        return await run_in_threadpool(remove_email,request.app.state.database,token(request),data.password)
+
+    @app.get('/api/auth/email')
+    async def email_status(request:Request):
+        from .email_accounts import status
+        result=await run_in_threadpool(status,request.app.state.database,token(request))
+        result['mail_enabled']=request.app.state.mailer.enabled
+        return result
+
+    @app.post('/api/auth/verify-email')
+    async def email_verify(request:Request):
+        from .email_accounts import verify
+        rate_auth(request);data=await read(request,TokenBody)
+        return await run_in_threadpool(verify,request.app.state.database,data.token)
+
+    @app.post('/api/auth/forgot')
+    async def forgot(request:Request,background:BackgroundTasks):
+        from .email_accounts import request_reset,normalize
+        rate_auth(request);data=await read(request,ForgotBody);need_mail(request)
+        address=normalize(data.email)
+        origin=origin_for(request);database=request.app.state.database;mailer=request.app.state.mailer
+        def work():
+            # Runs after the reply is sent: the answer and its timing are the same for every address.
+            if forgot_limiter.hit('e:'+address): return
+            found=request_reset(database,address)
+            if found:
+                mailer.send(found[1],'Reset your MindBridge password','Open this link to choose a new password. It works once and expires in 30 minutes:\n\n'+origin+'/#reset='+found[0]+'\n\nIf you did not ask for this, ignore this message: your password has not changed.')
+        background.add_task(work)
+        response=JSONResponse({'ok':True});response.headers['Cache-Control']='no-store'
+        return response
+
+    @app.post('/api/auth/reset')
+    async def reset(request:Request):
+        from .email_accounts import reset_password
+        rate_auth(request);data=await read(request,ResetBody)
+        key='x:'+data.token[:8]
+        result,new_token=await run_in_threadpool(reset_password,request.app.state.database,data.token,data.new_password)
+        response=cookie_reply(result,new_token);response.headers['Cache-Control']='no-store'
         return response
 
     @app.post('/api/auth/logout-all')

@@ -25,6 +25,7 @@ Configure secrets through the hosting dashboard, never in source:
 | `DATABASE_URL` | `postgresql+psycopg://...` with URL-encoded credentials and the host's required TLS options |
 | `PORT` | Host's assigned port, default 8000 |
 | `GROQ_API_KEY` | Leave unset for the initial hosted demo |
+| `SMTP_HOST`, `SMTP_PORT` (587), `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_STARTTLS` (1) | Optional. Set `SMTP_HOST` and `SMTP_FROM` to turn on account email (confirm an address, reset a password by link). Leave them unset and the email features stay hidden. Keep `SMTP_PASSWORD` in the host's secret store. Use a provider that signs mail for your domain (SPF and DKIM), or messages may land in spam; that is not tested here. |
 | `GROQ_MODEL` | Optional model ID available to your account |
 | `TRUST_PROXY_HOPS` | `1` behind a single reverse proxy such as the host's load balancer, otherwise `0`. **Without it every visitor shares the proxy's address, so the per-address rate limits throttle everyone together.** Set it only when the proxy really appends the client address to `X-Forwarded-For`; this was not verified on any live host |
 | `LOGIN_FAILURE_LIMIT` | Failed sign-ins per account name per 15 minutes before that name waits (default 10, allowed 3–100). Someone can deliberately trigger it for a name they do not own; that is the accepted trade-off |

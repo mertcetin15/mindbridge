@@ -7,15 +7,16 @@ from alembic.autogenerate import compare_metadata
 from sqlalchemy import inspect, text, MetaData
 
 ROOT = Path(__file__).resolve().parents[1]
-HEAD = '0003'
+HEAD = '0004'
 
 def migrate_engine(engine):
     from .database import Base
     from .planner import Planner  # register the new models
     from .recovery import RecoveryCode
+    from .email_accounts import UserEmail, EmailToken
     legacy=MetaData()
     for name,table in Base.metadata.tables.items():
-        if name not in ("planners","recovery_codes"):table.to_metadata(legacy)
+        if name not in ("planners","recovery_codes","user_emails","email_tokens"):table.to_metadata(legacy)
     config = Config(str(ROOT / 'alembic.ini'))
     with engine.begin() as connection:
         config.attributes['connection'] = connection

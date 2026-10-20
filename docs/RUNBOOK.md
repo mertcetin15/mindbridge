@@ -119,7 +119,7 @@ Check in this order, each is a real cause this code can produce:
 
 * **The application** rolls back by redeploying the previous image or commit. Assets are versioned by content digest, so a
   rolled-back page never mixes with newer files.
-* **The database schema** gained one table in this release: `recovery_codes` (migration `0003`, hash and date only). Back up first. Rolling the application back leaves the table in place; the old code ignores it. `alembic downgrade` for `0003` only drops that table (no account, entry or plan is touched), but it is never needed for a rollback.
+* **The database schema** gained three tables in this release: `recovery_codes` (migration `0003`, hash and date only) and `user_emails` and `email_tokens` (migration `0004`, the optional account email and hashes of single-use links). Back up first. Rolling the application back leaves the table in place; the old code ignores it. `alembic downgrade` for `0003` only drops that table (no account, entry or plan is touched), but it is never needed for a rollback.
 * **One real catch, tested:** this release stores a `status` and a `status_at` on each planner step. The *previous*
   server refuses any task that carries them (`extra_forbidden`), so after a rollback people who saved their plan with this
   release could not save it again. Before or right after rolling back, run `python scripts/downgrade_planner.py` (dry run,

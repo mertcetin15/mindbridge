@@ -14,7 +14,7 @@ FRONTEND = ROOT / 'frontend'
 PAGE = (FRONTEND / 'index.html').read_text(encoding='utf-8')
 REFS = re.findall(r'(?:src|href)="/assets/([^"?]+)\?v=([0-9a-f]{12})"', PAGE)
 
-LIMITS = {'scripts': 52, 'styles': 30, 'requests': 86, 'compressed_kb': 330, 'decoded_kb': 900, 'document_kb': 40, 'one_file_compressed_kb': 40}
+LIMITS = {'scripts': 53, 'styles': 30, 'requests': 88, 'compressed_kb': 330, 'decoded_kb': 900, 'document_kb': 40, 'one_file_compressed_kb': 40}
 
 
 def sizes():

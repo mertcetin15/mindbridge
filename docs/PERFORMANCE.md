@@ -45,7 +45,7 @@ path the received build would have cached correctly and this comparison would sh
 
 ## Budget enforced by the tests
 
-`tests/test_performance_budget.py` computes, from the built files, with the server's gzip level: scripts ≤ 52 (raised from 50 for the path strip, calm options and account recovery: five small files; bundling would remove the cost but loses error isolation between scripts and could not be verified end to end here),
+`tests/test_performance_budget.py` computes, from the built files, with the server's gzip level: scripts ≤ 53 (raised from 50 for the history module, calm options, account recovery and account email: six small files; bundling would remove the cost but loses error isolation between scripts and could not be verified end to end here),
 stylesheets ≤ 30, requests ≤ 84, compressed ≤ 330 KB, decoded ≤ 900 KB, document ≤ 40 KB, any one file ≤ 40 KB
 compressed. Current values: 45, 27, 76, 288 KB, 814 KB, 32 KB, 30 KB. The limits are about 10% above reality on
 purpose; a second test fails if they ever sit far above it. They are size limits, not timings.

@@ -16,7 +16,7 @@ Keyword-based human-help routing is a limited product safeguard, not a risk asse
 - **Sign out everywhere.** `POST /api/auth/logout-all` needs a session, a CSRF token and the current password, then deletes every session for the account. There is no button for it in the interface yet.
 - **AI budget per account.** When AI requires sign-in, each account may receive `AI_DAILY_QUOTA` replies per rolling 24 hours. A refused request returns `429 ai_quota` with `Retry-After` and never reaches the provider; successful replies include `ai_quota: {limit, remaining}`. Crisis help is never blocked by the quota, and indirect-distress messages fall back to the support note. Configuration errors and a busy provider do not spend the budget. State is in process memory and resets on restart.
 - **Isolation headers.** `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Resource-Policy: same-origin` on every response.
-- **Known remaining gaps:** no email verification or password reset (the app holds no email address), no two-factor authentication, no shared rate-limit store, registration reveals whether a username is taken, the CSP still allows inline scripts, and journal text is plaintext at rest. See `docs/DATA_INVENTORY.md`.
+- **Known remaining gaps:** no two-factor authentication, no shared rate-limit store, registration reveals whether a username is taken, the CSP still allows inline styles (scripts are `'self'` only), and journal text is plaintext at rest. See `docs/DATA_INVENTORY.md`.
 
 ## Account recovery without email (v21)
 
@@ -29,7 +29,22 @@ MindBridge keeps no email address, so no reset link can exist. A signed-in perso
 * Attempts are limited per address (the auth limiter) and per name (the failure limiter, key `r:<name>`): after `LOGIN_FAILURE_LIMIT` failures the name waits 15 minutes, even for the right code. This allows someone to lock a name's recovery for the window, as for sign-in.
 * Losing both the password and the code means the account cannot be recovered. The interface says so. There is no administrator back door.
 
-Tests: `tests/test_recovery.py` (10) and `tests/test_recovery_ui.cjs` (8). Still not present: email verification and a reset link (there is no email), and a recovery code created at sign-up (it is offered afterwards, by choice).
+Tests: `tests/test_recovery.py` (10) and `tests/test_recovery_ui.cjs` (8). A recovery code created at sign-up is not offered (it is created afterwards, by choice).
+
+## Optional account email (v21)
+
+When the operator sets `SMTP_HOST` and `SMTP_FROM` (see `docs/DEPLOYMENT.md`), a signed-in person may add an email address and confirm it; a confirmed address can reset a forgotten password by a single-use link. With no mail server configured every email route answers `503 email_unavailable` and the interface shows nothing.
+
+* The address is optional, added only after sign-up and only with the current password. It is personal data: it is listed in `docs/DATA_INVENTORY.md`, is used for nothing but these two messages, can be removed at any time and is deleted with the account (cascade).
+* Only a **confirmed** address can reset a password; typing someone else's address proves nothing. When the true owner confirms an address, anyone who had typed it without confirming loses it. The same address cannot be confirmed on two accounts.
+* Links carry 256 random bits; only their SHA-256 is stored. Confirmation links last 24 hours, reset links 30 minutes, each works once, and a newer reset link cancels the older one. A used reset link revokes every session and starts one new session.
+* The links are in the URL fragment (`/#reset=...`), which browsers never send to the server; the page reads it once, removes it from the address bar and posts it in a body.
+* "Forgot password" returns the same reply for a confirmed, an unconfirmed and an unknown address; the lookup and the send happen after the reply is sent. At most five reset emails per address per hour are sent (further requests look identical and send nothing). The per-address limiter and the auth limiter live in one process's memory.
+* The message holds the link and nothing else: no password, no username. A failed send logs the event name only, never the address or the link.
+
+Tests: `tests/test_email_accounts.py` (13) and `tests/test_email_ui.cjs` (10). Checked end to end with a real SMTP exchange against a local sink; **not** checked against a real provider, so deliverability (SPF, DKIM, spam folders) is untested. Email also makes a mail provider a processor of those addresses; the operator must say so in the privacy text.
+
+Still not present: two-factor authentication.
 
 ## Operational logging
 

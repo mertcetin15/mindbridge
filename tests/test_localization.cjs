@@ -23,7 +23,7 @@ test('every module that carries its own per-language copy has the same keys, arr
  assert.deepEqual(problems,[]);
 });
 test('the modules added in recent releases are all among the blocks that are checked',()=>{
- const names=new Set(languageBlocks().map(b=>b.file));for(const f of ['simplify.js','save-state.js','ask-help.js','reminders.js','welcome.js','calm-options.js','recovery-ui.js','recovery-ui.js','calm-room.js','planner.js','focus.js','zen-studio.js','studio.js'])assert(names.has(f),f+' is not being checked');
+ const names=new Set(languageBlocks().map(b=>b.file));for(const f of ['simplify.js','save-state.js','ask-help.js','reminders.js','welcome.js','calm-options.js','recovery-ui.js','email-ui.js','recovery-ui.js','calm-room.js','planner.js','focus.js','zen-studio.js','studio.js'])assert(names.has(f),f+' is not being checked');
 });
 test('no empty translation and no string that is only whitespace in any checked block',()=>{
  const empty=[];for(const b of languageBlocks())for(const l of LANGS)for(const [k,v] of Object.entries(b.flat[l]))if(typeof v==='string'&&!v.trim())empty.push(b.file+' '+b.name+' '+l+' '+k);assert.deepEqual(empty,[]);

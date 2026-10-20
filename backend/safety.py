@@ -30,7 +30,7 @@ SOFT_PATTERN = (
 
 # Region data lives here, not in the text. 'reviewed' stays None until a maintainer checks the
 # numbers against the official source; docs/SECURITY.md lists them as unverified.
-RESOURCES = {'DE': {'emergency': '112', 'helpline': '116 123', 'helpline_note': 'TelefonSeelsorge', 'reviewed': None}}
+RESOURCES = {'DE': {'emergency': '112', 'helpline': '116 123', 'helpline_note': 'TelefonSeelsorge', 'reviewed': None, 'source_check': '2026-10-20: 116 123 confirmed on telefonseelsorge.de (automated lookup, not a human review); 112 is the EU emergency number'}}
 
 CRISIS = {
     'en': 'If you may act on thoughts of harming yourself, seek immediate human help. In Germany, call 112 for immediate danger; TelefonSeelsorge: 116 123 (German-language support). If possible, contact someone you trust and ask them to stay with you. Outside Germany, use your local emergency service. This chat cannot provide emergency care.',
